@@ -1,0 +1,1573 @@
+openapi: 3.0.0
+info:
+  description: API for managing event locations
+  title: Event Management Service
+  version: 1.0.0
+servers:
+  - url: http://localhost:8080
+security:
+  - bearerAuth: []
+tags:
+  - name: Locations
+  - name: Events
+  - name: Users
+paths:
+  /locations:
+    get:
+      description: Получение всех локаций. Доступно всем авторизованным пользователям
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/EventLocation'
+                type: array
+          description: Список всех локаций
+        "401":
+          content:
+            application/json:
+              example:
+                message: Необходима аутентификация
+                detailedMessage: Более детальное сообщение об ошибке
+                dateTime: 2024-12-03T10:15:30
+              schema:
+                $ref: '#/components/schemas/ErrorMessageResponse'
+          description: Аутентификация отсутствует или не удалась
+        "403":
+          content:
+            application/json:
+              example:
+                message: Недостаточно прав для выполнения операции
+                detailedMessage: Более детальное сообщение об ошибке
+                dateTime: 2024-12-03T10:15:30
+              schema:
+                $ref: '#/components/schemas/ErrorMessageResponse'
+          description: У пользователя недостаточно прав для выполнения этой операции
+        "500":
+          content:
+            application/json:
+              example:
+                message: Внутренняя ошибка сервера
+                detailedMessage: Более детальное сообщение об ошибке
+                dateTime: 2024-12-03T10:15:30
+              schema:
+                $ref: '#/components/schemas/ErrorMessageResponse'
+          description: Внутренняя ошибка сервера
+      summary: "Получить список всех локаций. Allowed roles=[ADMIN, USER]"
+      tags:
+        - Locations
+    post:
+      description: Создать новую локацию. Доступно только админам. Id должен задаваться
+        на стороне приложения (базой данных)
+      requestBody:
+        content:
+          application/json:
+            example:
+              name: Ледовый дворец
+              address: "г. СПб, Пятилеток 1"
+              capacity: 12300
+              description: Спортивно-концертный комплекс в Санкт-Петербурге
+            schema:
+              $ref: '#/components/schemas/EventLocation'
+        required: true
+      responses:
+        "201":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EventLocation'
+          description: Место успешно создано
+        "400":
+          content:
+            application/json:
+              example:
+                message: Некорректный запрос
+                detailedMessage: Более детальное сообщение об ошибке
+                dateTime: 2024-12-03T10:15:30
+              schema:
+                $ref: '#/components/schemas/ErrorMessageResponse'
+          description: "Запрос с невалидными данными. Например, попытка занять зан\
+            ятый логин или некорректные параметры запроса."
+        "401":
+          content:
+            application/json:
+              example:
+                message: Необходима аутентификация
+                detailedMessage: Более детальное сообщение об ошибке
+                dateTime: 2024-12-03T10:15:30
+              schema:
+                $ref: '#/components/schemas/ErrorMessageResponse'
+          description: Аутентификация отсутствует или не удалась
+        "403":
+          content:
+            application/json:
+              example:
+                message: Недостаточно прав для выполнения операции
+                detailedMessage: Более детальное сообщение об ошибке
+                dateTime: 2024-12-03T10:15:30
+              schema:
+                $ref: '#/components/schemas/ErrorMessageResponse'
+          description: У пользователя недостаточно прав для выполнения этой операции
+        "404":
+          content:
+            application/json:
+              example:
+                message: Сущность не найдена
+                detailedMessage: Более детальное сообщение об ошибке
+                dateTime: 2024-12-03T10:15:30
+              schema:
+                $ref: '#/components/schemas/ErrorMessageResponse'
+          description: Сущность не найдена.
+        "500":
+          content:
+            application/json:
+              example:
+                message: Внутренняя ошибка сервера
+                detailedMessage: Более детальное сообщение об ошибке
+                dateTime: 2024-12-03T10:15:30
+              schema:
+                $ref: '#/components/schemas/ErrorMessageResponse'
+          description: Внутренняя ошибка сервера
+      summary: "Создать новую локацию. Allowed roles=[ADMIN]"
+      tags:
+        - Locations
+  /locations/{locationId}:
+    delete:
+      description: "Удалить локацию по идентификатору. Нельзя удалять те локации,\
+        \ на которых уже запланированы какие-то мероприятия (должна возвращаться о\
+        шибка 400)"
+      parameters:
+        - description: Уникальный идентификатор местоположения
+          in: path
+          name: locationId
+          required: true
+          schema:
+            example: 42
+            format: int64
+            type: integer
+      responses:
+        "204":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EventLocation'
+          description: Место успешно удалено
+        "401":
+          content:
+            application/json:
+              example:
+                message: Необходима аутентификация
+                detailedMessage: Более детальное сообщение об ошибке
+                dateTime: 2024-12-03T10:15:30
+              schema:
+                $ref: '#/components/schemas/ErrorMessageResponse'
+          description: Аутентификация отсутствует или не удалась
+        "403":
+          content:
+            application/json:
+              example:
+                message: Недостаточно прав для выполнения операции
+                detailedMessage: Более детальное сообщение об ошибке
+                dateTime: 2024-12-03T10:15:30
+              schema:
+                $ref: '#/components/schemas/ErrorMessageResponse'
+          description: У пользователя недостаточно прав для выполнения этой операции
+        "404":
+          content:
+            application/json:
+              example:
+                message: Сущность не найдена
+                detailedMessage: Более детальное сообщение об ошибке
+                dateTime: 2024-12-03T10:15:30
+              schema:
+                $ref: '#/components/schemas/ErrorMessageResponse'
+          description: Сущность не найдена.
+        "500":
+          content:
+            application/json:
+              example:
+                message: Внутренняя ошибка сервера
+                detailedMessage: Более детальное сообщение об ошибке
+                dateTime: 2024-12-03T10:15:30
+              schema:
+                $ref: '#/components/schemas/ErrorMessageResponse'
+          description: Внутренняя ошибка сервера
+      summary: "Удалить локацию. Allowed roles=[ADMIN]"
+      tags:
+        - Locations
+    get:
+      description: "Получить локацию по идентификатору. Учтите то, какие должны во\
+        звращаться коды ответа при различных сценариях. Например, 404 код, если су\
+        щность не найдена."
+      parameters:
+        - description: Уникальный идентификатор местоположения
+          in: path
+          name: locationId
+          required: true
+          schema:
+            example: 42
+            format: int64
+            type: integer
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EventLocation'
+          description: Успешный ответ
+        "400":
+          content:
+            application/json:
+              example:
+                message: Некорректный запрос
+                detailedMessage: Более детальное сообщение об ошибке
+                dateTime: 2024-12-03T10:15:30
+              schema:
+                $ref: '#/components/schemas/ErrorMessageResponse'
+          description: "Запрос с невалидными данными. Например, попытка занять зан\
+            ятый логин или некорректные параметры запроса."
+        "401":
+          content:
+            application/json:
+              example:
+                message: Необходима аутентификация
+                detailedMessage: Более детальное сообщение об ошибке
+                dateTime: 2024-12-03T10:15:30
+              schema:
+                $ref: '#/components/schemas/ErrorMessageResponse'
+          description: Аутентификация отсутствует или не удалась
+        "403":
+          content:
+            application/json:
+              example:
+                message: Недостаточно прав для выполнения операции
+                detailedMessage: Более детальное сообщение об ошибке
+                dateTime: 2024-12-03T10:15:30
+              schema:
+                $ref: '#/components/schemas/ErrorMessageResponse'
+          description: У пользователя недостаточно прав для выполнения этой операции
+        "404":
+          content:
+            application/json:
+              example:
+                message: Сущность не найдена
+                detailedMessage: Более детальное сообщение об ошибке
+                dateTime: 2024-12-03T10:15:30
+              schema:
+                $ref: '#/components/schemas/ErrorMessageResponse'
+          description: Сущность не найдена.
+        "500":
+          content:
+            application/json:
+              example:
+                message: Внутренняя ошибка сервера
+                detailedMessage: Более детальное сообщение об ошибке
+                dateTime: 2024-12-03T10:15:30
+              schema:
+                $ref: '#/components/schemas/ErrorMessageResponse'
+          description: Внутренняя ошибка сервера
+      summary: "Получить локацию по ID. Allowed roles=[ADMIN, USER]"
+      tags:
+        - Locations
+    put:
+      description: "Обновить место по его идентификатору. Доступно только админам\
+        . Учтите валидацию параметров. Также учтите то, что нельзя менять вместите\
+        льность локации в меньшую сторону из-за того, что на этой локации уже могу\
+        т быть запланированы мероприятия."
+      parameters:
+        - description: Уникальный идентификатор местоположения
+          in: path
+          name: locationId
+          required: true
+          schema:
+            example: 42
+            format: int64
+            type: integer
+      requestBody:
+        content:
+          application/json:
+            example:
+              name: Новое имя локации
+              address: Новый адрес
+              capacity: 20000
+              description: Новое описание
+            schema:
+              $ref: '#/components/schemas/EventLocation'
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EventLocation'
+          description: Место успешно обновлено
+        "400":
+          content:
+            application/json:
+              example:
+                message: Некорректный запрос
+                detailedMessage: Более детальное сообщение об ошибке
+                dateTime: 2024-12-03T10:15:30
+              schema:
+                $ref: '#/components/schemas/ErrorMessageResponse'
+          description: "Запрос с невалидными данными. Например, попытка занять зан\
+            ятый логин или некорректные параметры запроса."
+        "401":
+          content:
+            application/json:
+              example:
+                message: Необходима аутентификация
+                detailedMessage: Более детальное сообщение об ошибке
+                dateTime: 2024-12-03T10:15:30
+              schema:
+                $ref: '#/components/schemas/ErrorMessageResponse'
+          description: Аутентификация отсутствует или не удалась
+        "403":
+          content:
+            application/json:
+              example:
+                message: Недостаточно прав для выполнения операции
+                detailedMessage: Более детальное сообщение об ошибке
+                dateTime: 2024-12-03T10:15:30
+              schema:
+                $ref: '#/components/schemas/ErrorMessageResponse'
+          description: У пользователя недостаточно прав для выполнения этой операции
+        "404":
+          content:
+            application/json:
+              example:
+                message: Сущность не найдена
+                detailedMessage: Более детальное сообщение об ошибке
+                dateTime: 2024-12-03T10:15:30
+              schema:
+                $ref: '#/components/schemas/ErrorMessageResponse'
+          description: Сущность не найдена.
+        "500":
+          content:
+            application/json:
+              example:
+                message: Внутренняя ошибка сервера
+                detailedMessage: Более детальное сообщение об ошибке
+                dateTime: 2024-12-03T10:15:30
+              schema:
+                $ref: '#/components/schemas/ErrorMessageResponse'
+          description: Внутренняя ошибка сервера
+      summary: "Обновить локацию. Allowed roles=[ADMIN]"
+      tags:
+        - Locations
+  /users:
+    post:
+      description: Доступно без авторизации. По умолчанию создается пользователь с
+        ролью USER. Пользователя с ролью ADMIN создать должно быть невозможно. Должна
+        быть проверена уникальность логина. Логины должны быть различные у разных
+        пользователей.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserRegistration'
+        required: true
+      responses:
+        "201":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+          description: Пользователь успешно зарегистрирован
+        "400":
+          content:
+            application/json:
+              example:
+                message: Некорректный запрос
+                detailedMessage: Более детальное сообщение об ошибке
+                dateTime: 2024-12-03T10:15:30
+              schema:
+                $ref: '#/components/schemas/ErrorMessageResponse'
+          description: "Запрос с невалидными данными. Например, попытка занять зан\
+            ятый логин или некорректные параметры запроса."
+        "500":
+          content:
+            application/json:
+              example:
+                message: Внутренняя ошибка сервера
+                detailedMessage: Более детальное сообщение об ошибке
+                dateTime: 2024-12-03T10:15:30
+              schema:
+                $ref: '#/components/schemas/ErrorMessageResponse'
+          description: Внутренняя ошибка сервера
+      security: []
+      summary: Регистрация нового пользователя
+      tags:
+        - Users
+  /users/{userId}:
+    get:
+      description: "Получение данных пользователя (доступно только админам). Учтит\
+        е, что пароль не должен возвращаться в теле"
+      parameters:
+        - description: Уникальный идентификатор пользователя
+          in: path
+          name: userId
+          required: true
+          schema:
+            format: int64
+            type: integer
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+          description: Информация о пользователе
+        "401":
+          content:
+            application/json:
+              example:
+                message: Необходима аутентификация
+                detailedMessage: Более детальное сообщение об ошибке
+                dateTime: 2024-12-03T10:15:30
+              schema:
+                $ref: '#/components/schemas/ErrorMessageResponse'
+          description: Аутентификация отсутствует или не удалась
+        "403":
+          content:
+            application/json:
+              example:
+                message: Недостаточно прав для выполнения операции
+                detailedMessage: Более детальное сообщение об ошибке
+                dateTime: 2024-12-03T10:15:30
+              schema:
+                $ref: '#/components/schemas/ErrorMessageResponse'
+          description: У пользователя недостаточно прав для выполнения этой операции
+        "404":
+          content:
+            application/json:
+              example:
+                message: Сущность не найдена
+                detailedMessage: Более детальное сообщение об ошибке
+                dateTime: 2024-12-03T10:15:30
+              schema:
+                $ref: '#/components/schemas/ErrorMessageResponse'
+          description: Сущность не найдена.
+        "500":
+          content:
+            application/json:
+              example:
+                message: Внутренняя ошибка сервера
+                detailedMessage: Более детальное сообщение об ошибке
+                dateTime: 2024-12-03T10:15:30
+              schema:
+                $ref: '#/components/schemas/ErrorMessageResponse'
+          description: Внутренняя ошибка сервера
+      summary: "Получить информацию о пользователе по ID. Allowed roles=[ADMIN]"
+      tags:
+        - Users
+  /users/auth:
+    post:
+      description: Доступно без авторизации. Получение JWT токена по данным пользователя
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserCredentials'
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JwtResponse'
+          description: "Авторизация успешна, возвращен JWT"
+        "400":
+          content:
+            application/json:
+              example:
+                message: Некорректный запрос
+                detailedMessage: Более детальное сообщение об ошибке
+                dateTime: 2024-12-03T10:15:30
+              schema:
+                $ref: '#/components/schemas/ErrorMessageResponse'
+          description: "Запрос с невалидными данными. Например, попытка занять зан\
+            ятый логин или некорректные параметры запроса."
+        "404":
+          content:
+            application/json:
+              example:
+                message: Сущность не найдена
+                detailedMessage: Более детальное сообщение об ошибке
+                dateTime: 2024-12-03T10:15:30
+              schema:
+                $ref: '#/components/schemas/ErrorMessageResponse'
+          description: Сущность не найдена.
+        "401":
+          content:
+            application/json:
+              example:
+                message: Необходима аутентификация
+                detailedMessage: Более детальное сообщение об ошибке
+                dateTime: 2024-12-03T10:15:30
+              schema:
+                $ref: '#/components/schemas/ErrorMessageResponse'
+          description: Аутентификация отсутствует или не удалась
+        "500":
+          content:
+            application/json:
+              example:
+                message: Внутренняя ошибка сервера
+                detailedMessage: Более детальное сообщение об ошибке
+                dateTime: 2024-12-03T10:15:30
+              schema:
+                $ref: '#/components/schemas/ErrorMessageResponse'
+          description: Внутренняя ошибка сервера
+      security: []
+      summary: Авторизация пользователя и получение JWT
+      tags:
+        - Users
+  /events:
+    post:
+      description: "Учтите валидацию всех полей. Все поля обязательные при создани\
+        и, также должна быть соблюдена логика (например время не может быть в прош\
+        лом, стомость > 0 и т.д.) Локация должна существовать и ее вместимость дол\
+        жна позволять провести это мероприятие, т.е. кол-во мест должно быть доста\
+        точно для всех участников. Организатор (создатель) мероприятия не учитывае\
+        тся как участник."
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EventCreateRequestDto'
+        required: true
+      responses:
+        "201":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EventDto'
+          description: Мероприятие успешно создано. Возвращается созданное событие.
+        "400":
+          content:
+            application/json:
+              example:
+                message: Некорректный запрос
+                detailedMessage: Более детальное сообщение об ошибке
+                dateTime: 2024-12-03T10:15:30
+              schema:
+                $ref: '#/components/schemas/ErrorMessageResponse'
+          description: "Запрос с невалидными данными. Например, попытка занять зан\
+            ятый логин или некорректные параметры запроса."
+        "401":
+          content:
+            application/json:
+              example:
+                message: Необходима аутентификация
+                detailedMessage: Более детальное сообщение об ошибке
+                dateTime: 2024-12-03T10:15:30
+              schema:
+                $ref: '#/components/schemas/ErrorMessageResponse'
+          description: Аутентификация отсутствует или не удалась
+        "403":
+          content:
+            application/json:
+              example:
+                message: Недостаточно прав для выполнения операции
+                detailedMessage: Более детальное сообщение об ошибке
+                dateTime: 2024-12-03T10:15:30
+              schema:
+                $ref: '#/components/schemas/ErrorMessageResponse'
+          description: У пользователя недостаточно прав для выполнения этой операции
+        "404":
+          content:
+            application/json:
+              example:
+                message: Сущность не найдена
+                detailedMessage: Более детальное сообщение об ошибке
+                dateTime: 2024-12-03T10:15:30
+              schema:
+                $ref: '#/components/schemas/ErrorMessageResponse'
+          description: Сущность не найдена.
+        "500":
+          content:
+            application/json:
+              example:
+                message: Внутренняя ошибка сервера
+                detailedMessage: Более детальное сообщение об ошибке
+                dateTime: 2024-12-03T10:15:30
+              schema:
+                $ref: '#/components/schemas/ErrorMessageResponse'
+          description: Внутренняя ошибка сервера
+      summary: "Создание нового мероприятия. Allowed roles=[USER]"
+      tags:
+        - Events
+  /events/{eventId}:
+    delete:
+      description: "Доступно только ADMIN, либо создателю мероприятия. Т.е. роль и\
+        з JWT токена должна быть ADMIN, либо userId должен быть равен создателю ме\
+        ропрития. Должно быть реализовано \"мягкое(soft) удаление\" - на самом дел\
+        е строка в БД не удалется, только меняется статус мероприятия на CANCELLED.\
+        \ При этом нужно учесть то, что не каждое мероприятие можно отменить (можн\
+        о отменить только те мероприятия, которые еще не начались)."
+      parameters:
+        - description: Уникальный идентификатор мероприятия
+          in: path
+          name: eventId
+          required: true
+          schema:
+            example: 10
+            format: int64
+            type: integer
+      responses:
+        "204":
+          description: Мероприятие успешно удалено
+        "400":
+          content:
+            application/json:
+              example:
+                message: Некорректный запрос
+                detailedMessage: Более детальное сообщение об ошибке
+                dateTime: 2024-12-03T10:15:30
+              schema:
+                $ref: '#/components/schemas/ErrorMessageResponse'
+          description: "Запрос с невалидными данными. Например, попытка занять зан\
+            ятый логин или некорректные параметры запроса."
+        "401":
+          content:
+            application/json:
+              example:
+                message: Необходима аутентификация
+                detailedMessage: Более детальное сообщение об ошибке
+                dateTime: 2024-12-03T10:15:30
+              schema:
+                $ref: '#/components/schemas/ErrorMessageResponse'
+          description: Аутентификация отсутствует или не удалась
+        "403":
+          content:
+            application/json:
+              example:
+                message: Недостаточно прав для выполнения операции
+                detailedMessage: Более детальное сообщение об ошибке
+                dateTime: 2024-12-03T10:15:30
+              schema:
+                $ref: '#/components/schemas/ErrorMessageResponse'
+          description: У пользователя недостаточно прав для выполнения этой операции
+        "404":
+          content:
+            application/json:
+              example:
+                message: Сущность не найдена
+                detailedMessage: Более детальное сообщение об ошибке
+                dateTime: 2024-12-03T10:15:30
+              schema:
+                $ref: '#/components/schemas/ErrorMessageResponse'
+          description: Сущность не найдена.
+        "500":
+          content:
+            application/json:
+              example:
+                message: Внутренняя ошибка сервера
+                detailedMessage: Более детальное сообщение об ошибке
+                dateTime: 2024-12-03T10:15:30
+              schema:
+                $ref: '#/components/schemas/ErrorMessageResponse'
+          description: Внутренняя ошибка сервера
+      summary: "Удаление мероприятия. Allowed roles=[USER, ADMIN]"
+      tags:
+        - Events
+    get:
+      description: "Предусмотрите обработку ошибок, если мероприятие не найдено."
+      parameters:
+        - description: Уникальный идентификатор мероприятия
+          in: path
+          name: eventId
+          required: true
+          schema:
+            example: 10
+            format: int64
+            type: integer
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EventDto'
+          description: Данные мероприятия
+        "400":
+          content:
+            application/json:
+              example:
+                message: Некорректный запрос
+                detailedMessage: Более детальное сообщение об ошибке
+                dateTime: 2024-12-03T10:15:30
+              schema:
+                $ref: '#/components/schemas/ErrorMessageResponse'
+          description: "Запрос с невалидными данными. Например, попытка занять зан\
+            ятый логин или некорректные параметры запроса."
+        "401":
+          content:
+            application/json:
+              example:
+                message: Необходима аутентификация
+                detailedMessage: Более детальное сообщение об ошибке
+                dateTime: 2024-12-03T10:15:30
+              schema:
+                $ref: '#/components/schemas/ErrorMessageResponse'
+          description: Аутентификация отсутствует или не удалась
+        "403":
+          content:
+            application/json:
+              example:
+                message: Недостаточно прав для выполнения операции
+                detailedMessage: Более детальное сообщение об ошибке
+                dateTime: 2024-12-03T10:15:30
+              schema:
+                $ref: '#/components/schemas/ErrorMessageResponse'
+          description: У пользователя недостаточно прав для выполнения этой операции
+        "404":
+          content:
+            application/json:
+              example:
+                message: Сущность не найдена
+                detailedMessage: Более детальное сообщение об ошибке
+                dateTime: 2024-12-03T10:15:30
+              schema:
+                $ref: '#/components/schemas/ErrorMessageResponse'
+          description: Сущность не найдена.
+        "500":
+          content:
+            application/json:
+              example:
+                message: Внутренняя ошибка сервера
+                detailedMessage: Более детальное сообщение об ошибке
+                dateTime: 2024-12-03T10:15:30
+              schema:
+                $ref: '#/components/schemas/ErrorMessageResponse'
+          description: Внутренняя ошибка сервера
+      summary: "Получение мероприятия по ID. Allowed roles=[USER, ADMIN]"
+      tags:
+        - Events
+    put:
+      description: "Доступно только ADMIN, либо создателю мероприятия. Т.е. роль и\
+        з JWT токена должна быть ADMIN, либо userId должен быть равен создателю ме\
+        ропрития. Учтите то, как можно менять мероприятие. Валидируйте входные зна\
+        чения, например maxPlaces должно быть больше, чем уже записанных пользоват\
+        елей, стоимость > 0, длительность > 0 и т.д."
+      parameters:
+        - description: Уникальный идентификатор мероприятия
+          in: path
+          name: eventId
+          required: true
+          schema:
+            example: 10
+            format: int64
+            type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EventUpdateRequestDto'
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EventDto'
+          description: Обновленное мероприятие
+        "400":
+          content:
+            application/json:
+              example:
+                message: Некорректный запрос
+                detailedMessage: Более детальное сообщение об ошибке
+                dateTime: 2024-12-03T10:15:30
+              schema:
+                $ref: '#/components/schemas/ErrorMessageResponse'
+          description: "Запрос с невалидными данными. Например, попытка занять зан\
+            ятый логин или некорректные параметры запроса."
+        "401":
+          content:
+            application/json:
+              example:
+                message: Необходима аутентификация
+                detailedMessage: Более детальное сообщение об ошибке
+                dateTime: 2024-12-03T10:15:30
+              schema:
+                $ref: '#/components/schemas/ErrorMessageResponse'
+          description: Аутентификация отсутствует или не удалась
+        "403":
+          content:
+            application/json:
+              example:
+                message: Недостаточно прав для выполнения операции
+                detailedMessage: Более детальное сообщение об ошибке
+                dateTime: 2024-12-03T10:15:30
+              schema:
+                $ref: '#/components/schemas/ErrorMessageResponse'
+          description: У пользователя недостаточно прав для выполнения этой операции
+        "404":
+          content:
+            application/json:
+              example:
+                message: Сущность не найдена
+                detailedMessage: Более детальное сообщение об ошибке
+                dateTime: 2024-12-03T10:15:30
+              schema:
+                $ref: '#/components/schemas/ErrorMessageResponse'
+          description: Сущность не найдена.
+        "500":
+          content:
+            application/json:
+              example:
+                message: Внутренняя ошибка сервера
+                detailedMessage: Более детальное сообщение об ошибке
+                dateTime: 2024-12-03T10:15:30
+              schema:
+                $ref: '#/components/schemas/ErrorMessageResponse'
+          description: Внутренняя ошибка сервера
+      summary: "Обновление мероприятия. Allowed roles=[USER, ADMIN]"
+      tags:
+        - Events
+  /events/search:
+    post:
+      description: Поиск всех мероприятий по фильтру
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EventSearchRequestDto'
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/EventDto'
+                type: array
+          description: "Список мероприятий, соответствующих заданным фильтрам"
+        "400":
+          content:
+            application/json:
+              example:
+                message: Некорректный запрос
+                detailedMessage: Более детальное сообщение об ошибке
+                dateTime: 2024-12-03T10:15:30
+              schema:
+                $ref: '#/components/schemas/ErrorMessageResponse'
+          description: "Запрос с невалидными данными. Например, попытка занять зан\
+            ятый логин или некорректные параметры запроса."
+        "401":
+          content:
+            application/json:
+              example:
+                message: Необходима аутентификация
+                detailedMessage: Более детальное сообщение об ошибке
+                dateTime: 2024-12-03T10:15:30
+              schema:
+                $ref: '#/components/schemas/ErrorMessageResponse'
+          description: Аутентификация отсутствует или не удалась
+        "403":
+          content:
+            application/json:
+              example:
+                message: Недостаточно прав для выполнения операции
+                detailedMessage: Более детальное сообщение об ошибке
+                dateTime: 2024-12-03T10:15:30
+              schema:
+                $ref: '#/components/schemas/ErrorMessageResponse'
+          description: У пользователя недостаточно прав для выполнения этой операции
+        "404":
+          content:
+            application/json:
+              example:
+                message: Сущность не найдена
+                detailedMessage: Более детальное сообщение об ошибке
+                dateTime: 2024-12-03T10:15:30
+              schema:
+                $ref: '#/components/schemas/ErrorMessageResponse'
+          description: Сущность не найдена.
+        "500":
+          content:
+            application/json:
+              example:
+                message: Внутренняя ошибка сервера
+                detailedMessage: Более детальное сообщение об ошибке
+                dateTime: 2024-12-03T10:15:30
+              schema:
+                $ref: '#/components/schemas/ErrorMessageResponse'
+          description: Внутренняя ошибка сервера
+      summary: "Поиск мероприятий по фильтру. Allowed roles=[USER, ADMIN]"
+      tags:
+        - Events
+  /events/my:
+    get:
+      description: "Все мероприятия созданные пользователем, который выполняет зап\
+        рос."
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/EventDto'
+                type: array
+          description: "Список мероприятий, созданных пользователем"
+        "401":
+          content:
+            application/json:
+              example:
+                message: Необходима аутентификация
+                detailedMessage: Более детальное сообщение об ошибке
+                dateTime: 2024-12-03T10:15:30
+              schema:
+                $ref: '#/components/schemas/ErrorMessageResponse'
+          description: Аутентификация отсутствует или не удалась
+        "403":
+          content:
+            application/json:
+              example:
+                message: Недостаточно прав для выполнения операции
+                detailedMessage: Более детальное сообщение об ошибке
+                dateTime: 2024-12-03T10:15:30
+              schema:
+                $ref: '#/components/schemas/ErrorMessageResponse'
+          description: У пользователя недостаточно прав для выполнения этой операции
+        "500":
+          content:
+            application/json:
+              example:
+                message: Внутренняя ошибка сервера
+                detailedMessage: Более детальное сообщение об ошибке
+                dateTime: 2024-12-03T10:15:30
+              schema:
+                $ref: '#/components/schemas/ErrorMessageResponse'
+          description: Внутренняя ошибка сервера
+      summary: "Получение всех мероприятий, созданных текущим пользователем. Allowed\
+        \ roles=[USER]"
+      tags:
+        - Events
+  /events/registrations/{eventId}:
+    post:
+      description: "Необходимо учесть, что статус мероприятия должен позволять рег\
+        истрацию. Можно зарегестрироваться только на мероприятие, которое не закон\
+        очилось и не отменено."
+      parameters:
+        - description: Уникальный идентификатор мероприятия
+          in: path
+          name: eventId
+          required: true
+          schema:
+            example: 10
+            format: int64
+            type: integer
+      responses:
+        "200":
+          description: Успешная регистрация на мероприятие
+        "400":
+          content:
+            application/json:
+              example:
+                message: Некорректный запрос
+                detailedMessage: Более детальное сообщение об ошибке
+                dateTime: 2024-12-03T10:15:30
+              schema:
+                $ref: '#/components/schemas/ErrorMessageResponse'
+          description: "Запрос с невалидными данными. Например, попытка занять зан\
+            ятый логин или некорректные параметры запроса."
+        "401":
+          content:
+            application/json:
+              example:
+                message: Необходима аутентификация
+                detailedMessage: Более детальное сообщение об ошибке
+                dateTime: 2024-12-03T10:15:30
+              schema:
+                $ref: '#/components/schemas/ErrorMessageResponse'
+          description: Аутентификация отсутствует или не удалась
+        "403":
+          content:
+            application/json:
+              example:
+                message: Недостаточно прав для выполнения операции
+                detailedMessage: Более детальное сообщение об ошибке
+                dateTime: 2024-12-03T10:15:30
+              schema:
+                $ref: '#/components/schemas/ErrorMessageResponse'
+          description: У пользователя недостаточно прав для выполнения этой операции
+        "404":
+          content:
+            application/json:
+              example:
+                message: Сущность не найдена
+                detailedMessage: Более детальное сообщение об ошибке
+                dateTime: 2024-12-03T10:15:30
+              schema:
+                $ref: '#/components/schemas/ErrorMessageResponse'
+          description: Сущность не найдена.
+        "500":
+          content:
+            application/json:
+              example:
+                message: Внутренняя ошибка сервера
+                detailedMessage: Более детальное сообщение об ошибке
+                dateTime: 2024-12-03T10:15:30
+              schema:
+                $ref: '#/components/schemas/ErrorMessageResponse'
+          description: Внутренняя ошибка сервера
+      summary: "Регистрация пользователя на мероприятие по ID. Allowed roles=[USER]"
+      tags:
+        - Events
+  /events/registrations/cancel/{eventId}:
+    delete:
+      description: "Необходимо учесть статус мероприятия. Нельзя отменить регистра\
+        цию, если мероприятие уже началось или закончилось."
+      parameters:
+        - description: Уникальный идентификатор мероприятия
+          in: path
+          name: eventId
+          required: true
+          schema:
+            example: 10
+            format: int64
+            type: integer
+      responses:
+        "204":
+          description: Успешная отмена регистрации на мероприятие
+        "400":
+          content:
+            application/json:
+              example:
+                message: Некорректный запрос
+                detailedMessage: Более детальное сообщение об ошибке
+                dateTime: 2024-12-03T10:15:30
+              schema:
+                $ref: '#/components/schemas/ErrorMessageResponse'
+          description: "Запрос с невалидными данными. Например, попытка занять зан\
+            ятый логин или некорректные параметры запроса."
+        "401":
+          content:
+            application/json:
+              example:
+                message: Необходима аутентификация
+                detailedMessage: Более детальное сообщение об ошибке
+                dateTime: 2024-12-03T10:15:30
+              schema:
+                $ref: '#/components/schemas/ErrorMessageResponse'
+          description: Аутентификация отсутствует или не удалась
+        "403":
+          content:
+            application/json:
+              example:
+                message: Недостаточно прав для выполнения операции
+                detailedMessage: Более детальное сообщение об ошибке
+                dateTime: 2024-12-03T10:15:30
+              schema:
+                $ref: '#/components/schemas/ErrorMessageResponse'
+          description: У пользователя недостаточно прав для выполнения этой операции
+        "404":
+          content:
+            application/json:
+              example:
+                message: Сущность не найдена
+                detailedMessage: Более детальное сообщение об ошибке
+                dateTime: 2024-12-03T10:15:30
+              schema:
+                $ref: '#/components/schemas/ErrorMessageResponse'
+          description: Сущность не найдена.
+        "500":
+          content:
+            application/json:
+              example:
+                message: Внутренняя ошибка сервера
+                detailedMessage: Более детальное сообщение об ошибке
+                dateTime: 2024-12-03T10:15:30
+              schema:
+                $ref: '#/components/schemas/ErrorMessageResponse'
+          description: Внутренняя ошибка сервера
+      summary: "Отмена регистрации на мероприятие. Allowed roles=[USER]"
+      tags:
+        - Events
+  /events/registrations/my:
+    get:
+      description: "Все мероприятия на которые записан пользователь. Мероприятия д\
+        олжны возвращаться все, даже те, которые отменены или закончены."
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/EventDto'
+                type: array
+          description: "Список мероприятий, на которые пользователь зарегистрирова\
+            н"
+        "401":
+          content:
+            application/json:
+              example:
+                message: Необходима аутентификация
+                detailedMessage: Более детальное сообщение об ошибке
+                dateTime: 2024-12-03T10:15:30
+              schema:
+                $ref: '#/components/schemas/ErrorMessageResponse'
+          description: Аутентификация отсутствует или не удалась
+        "403":
+          content:
+            application/json:
+              example:
+                message: Недостаточно прав для выполнения операции
+                detailedMessage: Более детальное сообщение об ошибке
+                dateTime: 2024-12-03T10:15:30
+              schema:
+                $ref: '#/components/schemas/ErrorMessageResponse'
+          description: У пользователя недостаточно прав для выполнения этой операции
+        "500":
+          content:
+            application/json:
+              example:
+                message: Внутренняя ошибка сервера
+                detailedMessage: Более детальное сообщение об ошибке
+                dateTime: 2024-12-03T10:15:30
+              schema:
+                $ref: '#/components/schemas/ErrorMessageResponse'
+          description: Внутренняя ошибка сервера
+      summary: "Получение мероприятий, на которые зарегистрирован текущий пользова\
+        тель. Allowed roles=[USER]"
+      tags:
+        - Events
+components:
+  parameters:
+    locationId:
+      description: Уникальный идентификатор местоположения
+      in: path
+      name: locationId
+      required: true
+      schema:
+        example: 42
+        format: int64
+        type: integer
+    userId:
+      description: Уникальный идентификатор пользователя
+      in: path
+      name: userId
+      required: true
+      schema:
+        format: int64
+        type: integer
+    eventId:
+      description: Уникальный идентификатор мероприятия
+      in: path
+      name: eventId
+      required: true
+      schema:
+        example: 10
+        format: int64
+        type: integer
+  responses:
+    BadRequest:
+      content:
+        application/json:
+          example:
+            message: Некорректный запрос
+            detailedMessage: Более детальное сообщение об ошибке
+            dateTime: 2024-12-03T10:15:30
+          schema:
+            $ref: '#/components/schemas/ErrorMessageResponse'
+      description: "Запрос с невалидными данными. Например, попытка занять занятый\
+        \ логин или некорректные параметры запроса."
+    Unauthorized:
+      content:
+        application/json:
+          example:
+            message: Необходима аутентификация
+            detailedMessage: Более детальное сообщение об ошибке
+            dateTime: 2024-12-03T10:15:30
+          schema:
+            $ref: '#/components/schemas/ErrorMessageResponse'
+      description: Аутентификация отсутствует или не удалась
+    Forbidden:
+      content:
+        application/json:
+          example:
+            message: Недостаточно прав для выполнения операции
+            detailedMessage: Более детальное сообщение об ошибке
+            dateTime: 2024-12-03T10:15:30
+          schema:
+            $ref: '#/components/schemas/ErrorMessageResponse'
+      description: У пользователя недостаточно прав для выполнения этой операции
+    NotFound:
+      content:
+        application/json:
+          example:
+            message: Сущность не найдена
+            detailedMessage: Более детальное сообщение об ошибке
+            dateTime: 2024-12-03T10:15:30
+          schema:
+            $ref: '#/components/schemas/ErrorMessageResponse'
+      description: Сущность не найдена.
+    ServerError:
+      content:
+        application/json:
+          example:
+            message: Внутренняя ошибка сервера
+            detailedMessage: Более детальное сообщение об ошибке
+            dateTime: 2024-12-03T10:15:30
+          schema:
+            $ref: '#/components/schemas/ErrorMessageResponse'
+      description: Внутренняя ошибка сервера
+  schemas:
+    ErrorMessageResponse:
+      example:
+        message: Сообщение об ошибке
+        detailedMessage: Более детальное сообщение об ошибке
+        dateTime: 2024-12-03T10:15:30
+      properties:
+        message:
+          description: Человеко-читаемое сообщение об ошибке
+          type: string
+        detailedMessage:
+          description: "Более детальное сообщение об ошибке. Например, содержимое\
+            \ exception"
+          type: string
+        dateTime:
+          description: Дата и время возникновения ошибки. Формат "YYYY-MM-DDThh:mm:ss"
+          format: date-time
+          type: string
+      required:
+        - dateTime
+        - detailedMessage
+        - message
+      type: object
+    EventLocation:
+      example:
+        id: 42
+        name: Ледовый дворец
+        address: "г. СПб, Пятилеток 1"
+        capacity: 12300
+        description: Спортивно-концертный комплекс в Санкт-Петербурге
+      properties:
+        id:
+          description: Уникальный идентификатор локации
+          format: int64
+          readOnly: true
+          type: integer
+        name:
+          description: Имя локации
+          type: string
+        address:
+          description: Адрес локации
+          type: string
+        capacity:
+          description: Вместительность локации
+          minimum: 5
+          type: integer
+        description:
+          description: Дополнительное описание локации
+          type: string
+      required:
+        - address
+        - capacity
+        - name
+      type: object
+    User:
+      description: Данные пользователя
+      example:
+        id: 10
+        login: user_login
+        age: 21
+        role: USER
+      properties:
+        id:
+          description: Уникальный идентификатор пользователя
+          format: int64
+          type: integer
+        login:
+          description: Уникальный логин пользователя
+          type: string
+        age:
+          description: возраст пользователя
+          minimum: 0
+          type: int
+        role:
+          description: Роль пользователя
+          enum:
+            - ADMIN
+            - USER
+          type: string
+      required:
+        - age
+        - id
+        - login
+        - role
+      type: object
+    UserRegistration:
+      description: Данные для регистрации пользователя
+      example:
+        login: new_user
+        password: strongpassword
+        age: 21
+      properties:
+        login:
+          description: Логин пользователя. Должен быть уникальным
+          type: string
+        password:
+          description: Пароль пользователя
+          type: string
+        age:
+          description: Возраст пользователя
+          minimum: 18
+          type: int
+      required:
+        - age
+        - login
+        - password
+      type: object
+    JwtResponse:
+      example:
+        jwtToken: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+      properties:
+        jwtToken:
+          description: JWT token for authenticated user
+          example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+          type: string
+      type: object
+    UserCredentials:
+      description: Данные для авторизации пользователя. Для получения JWT-токена
+      example:
+        login: user_login
+        password: userpassword
+      properties:
+        login:
+          description: Логин пользователя для авторизации
+          type: string
+        password:
+          description: Пароль пользователя
+          type: string
+      required:
+        - login
+        - password
+      type: object
+    EventDto:
+      example:
+        occupiedPlaces: 15
+        date: 2000-01-23T04:56:07.000+00:00
+        duration: 60
+        cost: 1200
+        maxPlaces: 10
+        locationId: 0
+        name: Лекция по Java
+        id: 42
+        ownerId: "10"
+        status: WAIT_START
+      properties:
+        id:
+          example: 42
+          format: int64
+          type: integer
+        name:
+          description: Название мероприятия
+          example: Лекция по Java
+          type: string
+        ownerId:
+          description: id пользователя-создателя мероприятия
+          example: "10"
+          type: string
+        maxPlaces:
+          description: Максимальное кол-во мест на мероприятии
+          example: 10
+          type: integer
+        occupiedPlaces:
+          description: Кол-во уже занятых мест (создатель не учитывается при подсчете)
+          example: 15
+          type: integer
+        date:
+          description: Дата и время проведения мероприятия. Формат "YYYY-MM-DDThh:mm:ss"
+          format: date-time
+          type: string
+        cost:
+          description: Стоимость в рублях
+          example: 1200
+          minimum: 0
+          type: decimal
+        duration:
+          description: Длительность в минутах
+          example: 60
+          minimum: 30
+          type: integer
+        locationId:
+          description: "Идентификатор локации, где проходит мероприятие"
+          type: integer
+        status:
+          $ref: '#/components/schemas/EventStatus'
+      required:
+        - cost
+        - date
+        - duration
+        - id
+        - locationId
+        - maxPlaces
+        - name
+        - occupiedPlaces
+        - ownerId
+      type: object
+    EventStatus:
+      description: |-
+        * WAIT_START - мероприятие ожидает начала. Доступные новые регистрации в этом состоянии.
+        В этом состоянии еще возможно отменить мероприятие (перевести в статус CANCELLED), в остальных - нельзя.
+        * STARTED - мероприятие началось. Новые регистрации недоступны на мероприятие.
+        * CANCELLED - мероприятие отменено организтором. Новые регистрации недоступны на мероприятие.
+        * FINISHED - мероприятие окончилось. Новые регистрации недоступны на мероприятие.
+      enum:
+        - WAIT_START
+        - STARTED
+        - CLOSED
+        - FINISHED
+      example: WAIT_START
+      type: string
+    EventCreateRequestDto:
+      description: Объект с данными для создания нового мероприятия.
+      example:
+        date: 2000-01-23T04:56:07.000+00:00
+        duration: 60
+        cost: 1200
+        maxPlaces: 10
+        locationId: 10
+        name: Лекция по Java
+      properties:
+        name:
+          description: Название мероприятия
+          example: Лекция по Java
+          type: string
+        maxPlaces:
+          description: Максимальное кол-во мест на мероприятии
+          example: 10
+          type: integer
+        date:
+          description: Дата и время проведения мероприятия. Формат "YYYY-MM-DDThh:mm:ss"
+          format: date-time
+          type: string
+        cost:
+          description: Стоимость в рублях
+          example: 1200
+          minimum: 0
+          type: integer
+        duration:
+          description: Длительность в минутах
+          example: 60
+          minimum: 30
+          type: integer
+        locationId:
+          description: "Идентификатор локации, где проходит мероприятие"
+          example: 10
+          type: integer
+      required:
+        - cost
+        - date
+        - duration
+        - locationId
+        - maxPlaces
+        - name
+      type: object
+    EventUpdateRequestDto:
+      description: Объект с данными для обновления мероприятия
+      example:
+        date: 2000-01-23T04:56:07.000+00:00
+        duration: 60
+        cost: 3000
+        maxPlaces: 100
+        locationId: 50
+        name: Новое назание
+      properties:
+        name:
+          description: Новое название мероприятия
+          example: Новое назание
+          type: string
+        maxPlaces:
+          description: "Новое кол-во мест мероприятия. Локация должна позволять вм\
+            естить столько людей. Должно быть больше, чем уже записанных людей."
+          example: 100
+          type: integer
+        date:
+          description: Новая дата и время проведения мероприятия. Формат "YYYY-MM-DDThh:mm:ss"
+          format: date-time
+          type: string
+        cost:
+          description: Новая стоимость мероприятия в рублях
+          example: 3000
+          minimum: 0
+          type: decimal
+        duration:
+          description: Новая длительность в минутах
+          example: 60
+          minimum: 30
+          type: integer
+        locationId:
+          description: "Новая локация для мероприятия. Локация должна вмещать коли\
+            чество пользователей, которые уже записаны. Также локация должна вмеща\
+            ть maxPlaces - кол-во мест на мероприятии."
+          example: 50
+          type: integer
+      type: object
+    EventSearchRequestDto:
+      description: "Фильтр для поиска мероприятий. Обязательных полей нет. Если вс\
+        е поля не заданы, то должен вернуться список всех мероприятий"
+      example:
+        durationMax: 120
+        dateStartBefore: 2000-01-23T04:56:07.000+00:00
+        placesMin: 10
+        locationId: 5
+        eventStatus: WAIT_START
+        name: Лекция
+        placesMax: 100
+        costMin: 1000
+        dateStartAfter: 2000-01-23T04:56:07.000+00:00
+        costMax: 5000
+        durationMin: 60
+      properties:
+        name:
+          description: Имя мероприятия для поиска
+          example: Лекция
+          type: string
+        placesMin:
+          description: Минимальная вместимость мероприятия
+          example: 10
+          type: integer
+        placesMax:
+          description: Максимальная вместимость мероприятия
+          example: 100
+          type: integer
+        dateStartAfter:
+          description: Минимальная дата и время начала мероприятия. Формат "YYYY-MM-DDThh:mm:ss"
+          format: date-time
+          type: string
+        dateStartBefore:
+          description: Максимальная дата и время начала мероприятия. Формат "YYYY-MM-DDThh:mm:ss"
+          format: date-time
+          type: string
+        costMin:
+          description: Минимальная стоимость участия в рублях
+          example: 1000
+          type: number
+        costMax:
+          description: Максимальная стоимость участия в рублях
+          example: 5000
+          type: number
+        durationMin:
+          description: Минимальная длительность мероприятия (в минутах)
+          example: 60
+          type: integer
+        durationMax:
+          description: Максимальная длительность мероприятия (в минутах)
+          example: 120
+          type: integer
+        locationId:
+          description: Идентификатор локации мероприятия для фильтрации
+          example: 5
+          type: integer
+        eventStatus:
+          $ref: '#/components/schemas/EventStatus'
+      type: object
+  securitySchemes:
+    bearerAuth:
+      bearerFormat: JWT
+      scheme: bearer
+      type: http
