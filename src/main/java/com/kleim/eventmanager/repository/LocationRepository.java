@@ -9,7 +9,7 @@ import org.springframework.data.repository.query.Param;
 public interface LocationRepository extends JpaRepository<LocationEntity, Long> {
 
     @Query("""
-           SELECT l FROM LocationEntity l
+           SELECT l FROM LocationEntity l WHERE l.id =: id
            """)
     Location getById();
 }

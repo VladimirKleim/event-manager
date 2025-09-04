@@ -37,7 +37,7 @@ public class LocationService {
 
     public Location getLocationById(Long id) {
         if (!locationRepository.existsById(id)) {
-            throw new NoSuchElementException("TODO");
+            throw new NoSuchElementException("Location with id " + id + " not found");
         }
         var gotId = locationRepository.getById(id);
         return locationEntityConverter.toLocation(gotId);
@@ -47,16 +47,15 @@ public class LocationService {
         return locationRepository.findAll().stream().map(locationEntityConverter::toLocation).toList();
     }
 
-    public void deleteLocation(Long id) {
-        if (!locationRepository.existsById(id)) {
-            throw new NoSuchElementException("TODO");
-        }
+    public Location deleteLocation(Long id) {
+        var deleteLocation = locationRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Location with id " + id + " not found"));
         locationRepository.deleteById(id);
+      return locationEntityConverter.toLocation(deleteLocation);
     }
 
     public Location updateLocation(Long id, Location location) {
-        if (!locationRepository.existsById(id)) {
-            throw new NoSuchElementException("TODO");
+        if (location.id() != null) {
+            throw new NoSuchElementException("Location with id :" + id + " not found");
         }
         var updatedEntity = new LocationEntity(
                 id,

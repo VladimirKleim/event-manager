@@ -69,7 +69,7 @@ public class GlobalExceptionHandler {
             Exception e
     ) {
         exceptionLogger.error("Got exception", e);
-        var errorDTO =new ServerErrorDTO("Ошибка на сервере",
+        var errorDTO = new ServerErrorDTO("Ошибка на сервере",
                 e.getMessage(),
                 LocalDateTime.now());
 

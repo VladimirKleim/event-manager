@@ -6,7 +6,7 @@ import com.kleim.eventmanager.model.LocationDto;
 import com.kleim.eventmanager.service.LocationService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.expression.spel.ast.OpAnd;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
