@@ -1,4 +1,4 @@
 package com.kleim.eventmanager.model;
 
-public record LocationDto() {
+public class LocationEntityConverter {
 }
