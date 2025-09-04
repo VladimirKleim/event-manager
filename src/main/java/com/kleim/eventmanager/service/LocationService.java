@@ -25,9 +25,8 @@ public class LocationService {
 
 
     public Location createLocate(Location location) {
-//        if (!locationRepository.existsById(location.id())) {
-//            throw new IllegalArgumentException("todo");
-//        }
+         var locEntity = locationRepository.findById(location.id()).orElseThrow(() ->
+                 new IllegalArgumentException("Location was exists"));
 
         var createEntityLocation = locationEntityConverter.toEntity(location);
         var createdLocation = locationRepository.save(createEntityLocation);
