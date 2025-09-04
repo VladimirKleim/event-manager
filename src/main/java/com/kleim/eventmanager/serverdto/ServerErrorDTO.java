@@ -1,8 +1,15 @@
 package com.kleim.eventmanager.serverdto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
 
-@JsonInclude(content = JsonInclude.Include.NON_EMPTY)
-public class ServerErrorDTO {
-}
+import java.time.LocalDateTime;
+
+
+//@JsonInclude(content = JsonInclude.Include.NON_EMPTY)
+public record ServerErrorDTO(
+
+        String message,
+        String detailMessage,
+        LocalDateTime localDateTime
+
+) {}
