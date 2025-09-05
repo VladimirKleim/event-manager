@@ -25,7 +25,7 @@ public class LocationService {
 
 
     public Location createLocate(Location location) {
-        if (!locationRepository.existsById(location.id())) {
+        if (locationRepository.existsById(location.id())) {
             throw new NoSuchElementException("Location with id " + location.id() + " not found");
         }
 
