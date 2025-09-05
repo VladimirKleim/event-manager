@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.Optional;
+
 
 @Service
 public class LocationService {
@@ -25,8 +25,9 @@ public class LocationService {
 
 
     public Location createLocate(Location location) {
-         var locEntity = locationRepository.findById(location.id()).orElseThrow(() ->
-                 new IllegalArgumentException("Location was exists"));
+        if (!locationRepository.existsById(location.id())) {
+            throw new NoSuchElementException("Location with id " + location.id() + " not found");
+        }
 
         var createEntityLocation = locationEntityConverter.toEntity(location);
         var createdLocation = locationRepository.save(createEntityLocation);
@@ -35,11 +36,9 @@ public class LocationService {
     }
 
     public Location getLocationById(Long id) {
-        if (!locationRepository.existsById(id)) {
-            throw new NoSuchElementException("Location with id " + id + " not found");
-        }
-        var gotId = locationRepository.getById(id);
-        return locationEntityConverter.toLocation(gotId);
+        var locationEntity = locationRepository.findById(id).orElseThrow(() ->
+                new IllegalArgumentException("Location already exists"));
+        return locationEntityConverter.toLocation(locationEntity);
     }
 
     public List<Location> getAllLocations() {

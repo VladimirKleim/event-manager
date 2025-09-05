@@ -3,6 +3,7 @@ package com.kleim.eventmanager.entity;
 
 import jakarta.persistence.*;
 
+
 @Entity
 @Table(name = "locations")
 public class LocationEntity {

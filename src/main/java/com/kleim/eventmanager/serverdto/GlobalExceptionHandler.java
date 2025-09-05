@@ -25,7 +25,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ServerErrorDTO> handleValidationException(
             MethodArgumentNotValidException e
     ) {
-        exceptionLogger.info("todo");
+        exceptionLogger.info("Not valid result");
         String detailMessage = e.getBindingResult()
                 .getFieldErrors()
                 .stream()
@@ -33,7 +33,7 @@ public class GlobalExceptionHandler {
                 .collect(Collectors.joining(", "));
 
         var errorDTO = new ServerErrorDTO(
-                "todo",
+                "Not valid result",
                 detailMessage,
                 LocalDateTime.now());
 
@@ -44,7 +44,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ServerErrorDTO> handleEntityNotFoundException(
             EntityNotFoundException e
     ) {
-        exceptionLogger.info("todo");
+        exceptionLogger.info("Not valid result : Entity no found");
         var errorDTO = new ServerErrorDTO(
                 "todo",
                 e.getMessage(),

@@ -6,13 +6,11 @@ import com.kleim.eventmanager.model.LocationDto;
 import com.kleim.eventmanager.service.LocationService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
-import java.util.stream.Collectors;
+
 
 @RestController
 @RequestMapping("/locations")
@@ -31,7 +29,7 @@ public class LocationController {
     public ResponseEntity<LocationDto> createLocation(
             @RequestBody LocationDto location
     ) {
-        log.info("todo");
+        log.info("Got created location");
         var createdLocate = locationService.createLocate(locationConverter.toDomain(location));
         return ResponseEntity.status(HttpStatus.CREATED).body(locationConverter.toDtoLocation(createdLocate));
     }
@@ -41,7 +39,7 @@ public class LocationController {
     public ResponseEntity<LocationDto> getLocationById(
             @PathVariable("id") Long id
     ) {
-        log.info("todo");
+        log.info("Got location by id: %s".formatted(id));
         var loc = locationService.getLocationById(id);
         return ResponseEntity.status(HttpStatus.ACCEPTED).body(locationConverter.toDtoLocation(loc));
     }
@@ -51,7 +49,7 @@ public class LocationController {
     public List<LocationDto> getAllLocation(
 
     ) {
-        log.info("TODO");
+        log.info("Got all location");
         return locationService.getAllLocations().stream().map(locationConverter::toDtoLocation).toList();
     }
 
@@ -60,6 +58,7 @@ public class LocationController {
     public ResponseEntity<Void> deleteLocation(
             @PathVariable("id") Long id
     ) {
+        log.info("Got deleted location by id: %s".formatted(id));
         locationService.deleteLocation(id);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
@@ -70,7 +69,7 @@ public class LocationController {
             @PathVariable("id") Long id,
             @RequestBody LocationDto locationDto
     ) {
-       log.info("TODO");
+       log.info("Got updated location by id: %s".formatted(id));
        var updated = locationService.updateLocation(id, locationConverter.toDomain(locationDto));
        return ResponseEntity.status(HttpStatus.ACCEPTED).body(locationConverter.toDtoLocation(updated));
     }
