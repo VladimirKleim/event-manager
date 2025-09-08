@@ -2,16 +2,10 @@ package com.kleim.eventmanager.security.token;
 
 
 import com.kleim.eventmanager.auth.User;
-import com.kleim.eventmanager.auth.UserRole;
-import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-
-import javax.crypto.spec.SecretKeySpec;
-import java.nio.charset.StandardCharsets;
 import java.security.Key;
 import java.util.Date;
 import java.util.HashMap;
@@ -25,8 +19,8 @@ public class JwtTokenManager {
 
 
     public JwtTokenManager(
-            @Value("${jwt.lifetime}") Long tokenLifetime,
-            @Value("${jwt.singature}") String signKey
+            @Value("${token.lifetime}") Long tokenLifetime,
+            @Value("${token.singature}") String signKey
     ) {
         this.tokenLifetime = tokenLifetime;
         this.signKey = Keys.hmacShaKeyFor(signKey.getBytes());

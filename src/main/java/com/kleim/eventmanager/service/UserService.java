@@ -5,7 +5,6 @@ import com.kleim.eventmanager.converter.UserEntityConverter;
 import com.kleim.eventmanager.repository.UserRepository;
 import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
-import jakarta.validation.constraints.NotBlank;
 import org.springframework.stereotype.Service;
 
 @Service

@@ -5,6 +5,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
 public record SignUpRequest(
+
         @NotBlank
         String login,
 
@@ -15,4 +16,6 @@ public record SignUpRequest(
         @Min(18)
         Integer age
 
-) {}
+) {
+
+}

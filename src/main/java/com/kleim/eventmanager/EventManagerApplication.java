@@ -4,10 +4,10 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class EventmanagerApplication {
+public class EventManagerApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(EventmanagerApplication.class, args);
+		SpringApplication.run(EventManagerApplication.class, args);
 	}
 
 

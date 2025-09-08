@@ -31,7 +31,7 @@ public class SecurityConfiguration {
                 .sessionManagement(sessionManagement -> sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) //for jwt tokens
                 .authorizeHttpRequests(auth ->
                            auth.requestMatchers(HttpMethod.POST, "/locations").hasAuthority("ADMIN")
-//                                .requestMatchers(HttpMethod.GET, "/locations").hasAnyAuthority("USER", "ADMIN")
+                                .requestMatchers(HttpMethod.GET, "/locations").hasAnyAuthority("USER", "ADMIN")
                                 .requestMatchers(HttpMethod.GET, "/locations/{id}").hasAnyAuthority("USER", "ADMIN")
                                 .requestMatchers(HttpMethod.DELETE, "/locations/{id}").hasAuthority("ADMIN")
                                 .requestMatchers(HttpMethod.PUT, "/locations/{id}").hasAuthority("ADMIN")

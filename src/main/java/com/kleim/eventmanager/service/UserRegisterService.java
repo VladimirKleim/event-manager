@@ -10,12 +10,10 @@ import org.springframework.stereotype.Service;
 @Service
 public class UserRegisterService {
 
-    private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final UserService userService;
 
-    public UserRegisterService(UserRepository userRepository, PasswordEncoder passwordEncoder, UserService userService) {
-        this.userRepository = userRepository;
+    public UserRegisterService(PasswordEncoder passwordEncoder, UserService userService) {
         this.passwordEncoder = passwordEncoder;
         this.userService = userService;
     }

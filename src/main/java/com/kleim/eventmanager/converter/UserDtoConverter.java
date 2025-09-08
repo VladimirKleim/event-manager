@@ -5,7 +5,7 @@ import com.kleim.eventmanager.auth.UserDTO;
 import org.springframework.stereotype.Component;
 
 @Component
-public class UserDTOconverter {
+public class UserDtoConverter {
 
      public UserDTO toDtoUser(User user) {
          return new UserDTO(

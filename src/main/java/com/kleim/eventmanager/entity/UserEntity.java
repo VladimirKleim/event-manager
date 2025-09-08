@@ -13,13 +13,13 @@ public final class UserEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "login", unique = true)
+    @Column(name = "login", unique = true, nullable = false)
     private String login;
-    @Column(name = "password")
+    @Column(name = "password", nullable = false)
     private String password;
-    @Column(name = "age")
+    @Column(name = "age", nullable = false)
     private Integer age;
-    @Column(name = "role")
+    @Column(name = "role", nullable = false)
     private String role;
 
     public UserEntity() {}
