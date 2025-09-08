@@ -17,6 +17,10 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SecurityConfiguration {
     @Autowired
     private JwtTokenFilter jwtTokenFilter;
+    @Autowired
+    private CustomAuthEntryPoint customAuthEntryPoint;
+    @Autowired
+    private AccessDeniedHandler accessDeniedHandler;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
@@ -24,10 +28,10 @@ public class SecurityConfiguration {
                 .formLogin(AbstractHttpConfigurer::disable)
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(AbstractHttpConfigurer::disable)
-                .sessionManagement(sesionManagement -> sesionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) //for jwt tokens
+                .sessionManagement(sessionManagement -> sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) //for jwt tokens
                 .authorizeHttpRequests(auth ->
                            auth.requestMatchers(HttpMethod.POST, "/locations").hasAuthority("ADMIN")
-                                .requestMatchers(HttpMethod.GET, "/locations").hasAnyAuthority("USER", "ADMIN")
+//                                .requestMatchers(HttpMethod.GET, "/locations").hasAnyAuthority("USER", "ADMIN")
                                 .requestMatchers(HttpMethod.GET, "/locations/{id}").hasAnyAuthority("USER", "ADMIN")
                                 .requestMatchers(HttpMethod.DELETE, "/locations/{id}").hasAuthority("ADMIN")
                                 .requestMatchers(HttpMethod.PUT, "/locations/{id}").hasAuthority("ADMIN")
@@ -35,9 +39,11 @@ public class SecurityConfiguration {
                                .requestMatchers(HttpMethod.POST, "/users").permitAll()
                                .requestMatchers(HttpMethod.POST, "/users/auth").permitAll()
                                .requestMatchers(HttpMethod.GET, "/users/{id}").hasAuthority("ADMIN")
-
+                                   .anyRequest().permitAll()
                                 )
                 .addFilterBefore(jwtTokenFilter, UsernamePasswordAuthenticationFilter.class)
+                .exceptionHandling(exp -> exp.authenticationEntryPoint(customAuthEntryPoint)
+                        .accessDeniedHandler(accessDeniedHandler))
 
 
                 .build();

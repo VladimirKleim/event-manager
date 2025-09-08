@@ -3,6 +3,7 @@ package com.kleim.eventmanager.service;
 import com.kleim.eventmanager.auth.User;
 import com.kleim.eventmanager.converter.UserEntityConverter;
 import com.kleim.eventmanager.repository.UserRepository;
+import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.constraints.NotBlank;
 import org.springframework.stereotype.Service;
@@ -33,5 +34,11 @@ public class UserService {
         return userRepository.findByLogin(login)
                 .map(userEntityConverter::toDomain)
                 .orElseThrow(() -> new EntityNotFoundException("User not found"));
+    }
+
+    public User getUserById(Long id) {
+        return userRepository.findById(id)
+                .map(userEntityConverter::toDomain)
+                .orElseThrow(() -> new EntityExistsException("User with id: %s not found".formatted(id)));
     }
 }

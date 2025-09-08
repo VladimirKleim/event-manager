@@ -4,6 +4,7 @@ package com.kleim.eventmanager.controller;
 import com.kleim.eventmanager.model.LocationConverter;
 import com.kleim.eventmanager.model.LocationDto;
 import com.kleim.eventmanager.service.LocationService;
+import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -27,7 +28,7 @@ public class LocationController {
 
     @PostMapping
     public ResponseEntity<LocationDto> createLocation(
-            @RequestBody LocationDto location
+            @RequestBody @Valid LocationDto location
     ) {
         log.info("Got created location");
         var createdLocate = locationService.createLocate(locationConverter.toDomain(location));
@@ -54,7 +55,7 @@ public class LocationController {
     }
 
 
-    @DeleteMapping("{id}")
+    @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteLocation(
             @PathVariable("id") Long id
     ) {
@@ -64,7 +65,7 @@ public class LocationController {
     }
 
 
-    @PutMapping("{id}")
+    @PutMapping("/{id}")
     public ResponseEntity<LocationDto> updateLocation(
             @PathVariable("id") Long id,
             @RequestBody LocationDto locationDto

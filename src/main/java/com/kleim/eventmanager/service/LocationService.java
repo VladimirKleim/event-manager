@@ -25,8 +25,8 @@ public class LocationService {
 
 
     public Location createLocate(Location location) {
-        if (locationRepository.existsById(location.id())) {
-            throw new NoSuchElementException("Location with id " + location.id() + " not found");
+        if (location.id() != null) {
+            throw new IllegalArgumentException("Can not create location with provided id. Id Must be empty");
         }
 
         var createEntityLocation = locationEntityConverter.toEntity(location);
