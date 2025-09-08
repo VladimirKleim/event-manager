@@ -1,10 +1,10 @@
-package com.kleim.eventmanager.auth;
+package com.kleim.eventmanager.controller;
 
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
-public record UserSingInRequest(
+public record SignUpRequest(
         @NotBlank
         String login,
 

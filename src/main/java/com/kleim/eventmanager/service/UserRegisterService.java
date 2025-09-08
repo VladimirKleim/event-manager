@@ -2,8 +2,7 @@ package com.kleim.eventmanager.service;
 
 import com.kleim.eventmanager.auth.User;
 import com.kleim.eventmanager.auth.UserRole;
-import com.kleim.eventmanager.auth.UserSingInRequest;
-import com.kleim.eventmanager.entity.UserEntity;
+import com.kleim.eventmanager.controller.SignUpRequest;
 import com.kleim.eventmanager.repository.UserRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -22,17 +21,17 @@ public class UserRegisterService {
     }
 
     public User saveUser(
-            UserSingInRequest userSingInRequest
+            SignUpRequest signUpRequest
     ) {
-        if(userService.isUserExistsByLogin(userSingInRequest.login())) {
-            throw new IllegalArgumentException("...");
+        if(userService.isUserExistsByLogin(signUpRequest.login())) {
+            throw new IllegalArgumentException("User login already exists");
         }
-        var encodePassword = passwordEncoder.encode(userSingInRequest.password());
+        var encodePassword = passwordEncoder.encode(signUpRequest.password());
         var user = new User(
                 null,
-                userSingInRequest.login(),
+                signUpRequest.login(),
                 encodePassword,
-                userSingInRequest.age(),
+                signUpRequest.age(),
                 UserRole.USER
         );
         return userService.createUser(user);
