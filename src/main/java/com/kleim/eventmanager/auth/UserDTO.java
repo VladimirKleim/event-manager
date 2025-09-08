@@ -1,9 +1,8 @@
 package com.kleim.eventmanager.auth;
 
-public record User(
+public record UserDTO(
         Long id,
         String login,
-        String password,
         Integer age,
         UserRole role
 ) {
