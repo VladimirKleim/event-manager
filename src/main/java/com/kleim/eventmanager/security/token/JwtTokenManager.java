@@ -71,8 +71,17 @@ public class JwtTokenManager {
                 .setSigningKey(signKey)
                 .build()
                 .parseClaimsJws(jwtToken)
-                .getBody().get("role", String.class);
+                .getBody()
+                .get("role", String.class);
 
+    }
+
+    public String getTokenById(String jwtToken) {
+        return Jwts.parser()
+                .setSigningKey(signKey)
+                .build().parseClaimsJws(jwtToken)
+                .getBody()
+                .getId();
     }
 }
 

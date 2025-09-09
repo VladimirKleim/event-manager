@@ -1,5 +1,6 @@
 package com.kleim.eventmanager.security.token;
 
+import com.kleim.eventmanager.service.UserService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -18,9 +19,11 @@ import java.util.List;
 public class JwtTokenFilter extends OncePerRequestFilter {
 
     private final JwtTokenManager jwtTokenManager;
+    private final UserService userService;
 
-    public JwtTokenFilter(JwtTokenManager jwtTokenManager) {
+    public JwtTokenFilter(JwtTokenManager jwtTokenManager, UserService userService) {
         this.jwtTokenManager = jwtTokenManager;
+        this.userService = userService;
     }
 
     @Override
@@ -43,9 +46,15 @@ public class JwtTokenFilter extends OncePerRequestFilter {
         }
         var login = jwtTokenManager.getLoginFromToken(jwtToken);
         var role = jwtTokenManager.getRoleFromToken(jwtToken);
+        var id = jwtTokenManager.getTokenById(jwtToken);
+
+        var user = userService.getUserByLogin(login);
 
         UsernamePasswordAuthenticationToken token =
-                new UsernamePasswordAuthenticationToken(login,null, List.of(new SimpleGrantedAuthority(role)));
+                new UsernamePasswordAuthenticationToken(
+                        user,
+                        null,
+                        List.of(new SimpleGrantedAuthority(role)));
         SecurityContextHolder.getContext().setAuthentication(token);
 
         filterChain.doFilter(request,response);

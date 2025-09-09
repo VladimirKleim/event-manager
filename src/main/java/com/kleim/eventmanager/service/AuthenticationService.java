@@ -1,8 +1,10 @@
 package com.kleim.eventmanager.service;
 
 import com.kleim.eventmanager.auth.SignInRequest;
+import com.kleim.eventmanager.auth.User;
 import com.kleim.eventmanager.security.token.JwtTokenManager;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -28,5 +30,11 @@ public class AuthenticationService {
            throw new BadCredentialsException("Not valid login");
         }
        return jwtTokenManager.generateToken(user);
+    }
+
+    public User getCurrentAuthUser() {
+       var authUser =  SecurityContextHolder.getContext().getAuthentication();
+      return (User) authUser.getPrincipal();
+
     }
 }
