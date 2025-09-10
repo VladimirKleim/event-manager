@@ -4,17 +4,9 @@ import com.kleim.eventmanager.auth.UserRole;
 import com.kleim.eventmanager.entity.EventEntity;
 import com.kleim.eventmanager.model.event.*;
 import com.kleim.eventmanager.repository.EventRepository;
-import com.kleim.eventmanager.repository.UserRepository;
-import com.kleim.eventmanager.security.token.JwtTokenFilter;
-import com.kleim.eventmanager.security.token.JwtTokenManager;
-import org.springframework.boot.http.client.ClientHttpRequestFactoryBuilder;
-import org.springframework.boot.http.client.ClientHttpRequestFactorySettings;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
-
-import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
+
 
 @Service
 public class EventService {
