@@ -1,29 +1,4 @@
 package com.kleim.eventmanager.entity;
-//name*	string
-//example: Лекция по Java
-//Название мероприятия
-//
-//maxPlaces*	integer
-//example: 10
-//Максимальное кол-во мест на мероприятии
-//
-//date*	string($date-time)
-//Дата и время проведения мероприятия. Формат "YYYY-MM-DDThh:mm:ss"
-//
-//cost*	integer
-//example: 1200
-//minimum: 0
-//Стоимость в рублях
-//
-//duration*	integer
-//example: 60
-//minimum: 30
-//Длительность в минутах
-//
-//locationId*	integer
-//example: 10
-//        Идентификатор локации, где проходит мероприятие
-
 
 import com.kleim.eventmanager.model.event.EventStatus;
 import jakarta.persistence.*;

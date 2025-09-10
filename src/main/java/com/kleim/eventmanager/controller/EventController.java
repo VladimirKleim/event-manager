@@ -3,16 +3,14 @@ package com.kleim.eventmanager.controller;
 import com.kleim.eventmanager.model.event.EventConverter;
 import com.kleim.eventmanager.model.event.EventDto;
 import com.kleim.eventmanager.model.event.EventRequestDto;
+import com.kleim.eventmanager.model.event.EventUpdateRequestDto;
 import com.kleim.eventmanager.service.EventService;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/events")
@@ -36,5 +34,32 @@ public class EventController {
       log.info("");
       var savedEvent = eventService.eventCreate(eventDto);
       return ResponseEntity.status(HttpStatus.CREATED).body(eventConverter.toDto(savedEvent));
+    }
+
+    @GetMapping("/{eventId}")
+    public ResponseEntity<EventDto> getEventById(
+            @PathVariable("eventId") Long eventId
+    ) {
+        var foundEvent = eventService.findEventById(eventId);
+        return ResponseEntity.status(HttpStatus.FOUND).body(eventConverter.toDto(foundEvent));
+
+    }
+
+    @DeleteMapping("/{eventId}")
+    public ResponseEntity<Void> deleteEventById(
+           @PathVariable("eventId") Long eventId
+    ) {
+        log.info("");
+        eventService.deleteEvent(eventId);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    }
+
+    @PutMapping("/{eventId}")
+    public ResponseEntity<EventDto> updateEvent(
+            @PathVariable("eventId") Long eventId,
+            @RequestBody @Valid EventUpdateRequestDto update
+    ) {
+       var updatedEvent = eventService.eventUpdate(eventId, update);
+        return ResponseEntity.status(HttpStatus.ACCEPTED).body(eventConverter.toDto(updatedEvent));
     }
 }
