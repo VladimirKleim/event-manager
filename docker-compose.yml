@@ -9,6 +9,10 @@ services:
       POSTGRES_DB: EventManager
     ports:
       - "5431:5432"
+
+
+    #TO FEATURES
+
 #    volumes:
 #      - pgdata:/var/lib/postgresql/data
 #    networks:
