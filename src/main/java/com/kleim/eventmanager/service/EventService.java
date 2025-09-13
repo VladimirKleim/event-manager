@@ -5,7 +5,10 @@ import com.kleim.eventmanager.entity.EventEntity;
 import com.kleim.eventmanager.model.event.*;
 import com.kleim.eventmanager.repository.EventRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import java.util.List;
+import java.util.Optional;
 
 
 @Service
@@ -55,6 +58,7 @@ public class EventService {
                 new IllegalArgumentException("Not found id: %s".formatted(eventId))));
     }
 
+    @Transactional
     public void deleteEvent(Long eventId) {
 
        checkCurrentAccessEvent(eventId);
@@ -70,6 +74,7 @@ public class EventService {
 
     }
 
+
     public Event eventUpdate(Long eventId, EventUpdateRequestDto updateRequestDto) {
         checkCurrentAccessEvent(eventId);
 
@@ -77,6 +82,28 @@ public class EventService {
         if (!event.status().equals(EventStatus.WAIT_START)) {
             throw new IllegalArgumentException("Cannot update event before start");
         }
+        if (updateRequestDto.locationId() != null) {
+            var locationId = Optional.ofNullable(updateRequestDto.locationId()).orElse(event.locationId());
+            var location = locationService.getLocationById(locationId);
+            var maxPlaces = Optional.ofNullable(updateRequestDto.maxPlace()).orElse(event.maxPlace());
+            if (maxPlaces > location.capacity()) {
+                throw new IllegalArgumentException("Capacity must not be more than max places");
+            }
+        }
+        if (event.maxPlace() != null && event.registrationList().size() > updateRequestDto.maxPlace()) {
+            throw new IllegalArgumentException("All places reserved");
+        }
+
+
+//        var upd = eventRepository.updateEvent(
+//                Optional.ofNullable(updateRequestDto.name()).orElse(event.name()),
+//                Optional.ofNullable(updateRequestDto.maxPlace()).orElse(event.maxPlace(),
+//                Optional.ofNullable(updateRequestDto.cost()).orElse(event.cost()),
+//                Optional.ofNullable(updateRequestDto.duration()).orElse(event.duration()),
+//                Optional.ofNullable(updateRequestDto.locationId()).orElse(event.locationId())
+//        );
+        return null;
+
     }
 
 

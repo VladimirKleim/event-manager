@@ -8,17 +8,21 @@ import jakarta.validation.constraints.Positive;
 import java.time.LocalDateTime;
 
 public record EventUpdateRequestDto(
-        @NotBlank
+
         String name,
+
         @Positive
-        int maxPlace,
+        Integer maxPlace,
+
         @Future
         LocalDateTime date,
-        @NotNull
-        int cost,
-        @NotNull
-        int duration,
-        @NotNull
+
+        @Positive
+        Integer cost,
+
+        @Positive
+        Integer duration,
+
         Long locationId
 ) {
 }
