@@ -3,6 +3,8 @@ package com.kleim.eventmanager.auth;
 import com.kleim.eventmanager.service.UserService;
 import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.context.event.ApplicationContextEvent;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -21,7 +23,7 @@ public class InitializrDefaultEntity {
         this.passwordEncoder = passwordEncoder;
     }
 
-    @EventListener(ContextRefreshedEvent.class)
+    @EventListener(ApplicationReadyEvent.class)
     public void starterInitialEntity() {
         createUser("admin", "admin", UserRole.ADMIN);
         createUser("use", "use", UserRole.USER);
