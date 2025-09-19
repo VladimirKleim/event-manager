@@ -15,12 +15,16 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 @Configuration
 public class SecurityConfiguration {
-    @Autowired
-    private JwtTokenFilter jwtTokenFilter;
+
+    private final JwtTokenFilter jwtTokenFilter;
     @Autowired
     private CustomAuthEntryPoint customAuthEntryPoint;
     @Autowired
     private AccessDeniedHandler accessDeniedHandler;
+
+    public SecurityConfiguration(JwtTokenFilter jwtTokenFilter) {
+        this.jwtTokenFilter = jwtTokenFilter;
+    }
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
