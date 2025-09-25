@@ -1,7 +1,7 @@
 package com.kleim.eventmanager.security.token;
 
 
-import com.kleim.eventmanager.auth.User;
+import com.kleim.eventmanager.auth.pojo.User;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;

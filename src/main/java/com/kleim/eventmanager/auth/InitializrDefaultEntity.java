@@ -1,8 +1,8 @@
 package com.kleim.eventmanager.auth;
 
-import com.kleim.eventmanager.service.UserService;
-import jakarta.annotation.PostConstruct;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.kleim.eventmanager.auth.domain.UserRole;
+import com.kleim.eventmanager.auth.domain.UserService;
+import com.kleim.eventmanager.auth.pojo.User;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.security.crypto.password.PasswordEncoder;

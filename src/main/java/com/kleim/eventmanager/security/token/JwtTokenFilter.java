@@ -1,6 +1,6 @@
 package com.kleim.eventmanager.security.token;
 
-import com.kleim.eventmanager.service.UserService;
+import com.kleim.eventmanager.auth.domain.UserService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

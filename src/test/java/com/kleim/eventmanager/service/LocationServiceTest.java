@@ -1,26 +1,16 @@
 package com.kleim.eventmanager.service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.kleim.eventmanager.entity.LocationEntity;
-import com.kleim.eventmanager.model.Location;
-import com.kleim.eventmanager.model.LocationConverter;
-import com.kleim.eventmanager.model.LocationDto;
-import com.kleim.eventmanager.model.LocationEntityConverter;
-import com.kleim.eventmanager.repository.LocationRepository;
+import com.kleim.eventmanager.location.domain.Location;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
 
-import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
