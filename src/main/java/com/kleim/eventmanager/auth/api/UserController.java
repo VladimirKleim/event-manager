@@ -43,10 +43,6 @@ public class UserController {
     ) {
         log.info("User register with: login={}, age={}", signUpRequest.login(), signUpRequest.age());
         var savedUser = userRegisterService.saveUser(signUpRequest);
-        var token = jwtTokenManager.generateToken(savedUser);
-        log.info(token);
-        log.info(jwtTokenManager.isTokenValid(token) + "");
-        log.info(jwtTokenManager.getLoginFromToken(token));
        return ResponseEntity.status(HttpStatus.CREATED).body(userDTOconverter.toDtoUser(savedUser));
     }
 

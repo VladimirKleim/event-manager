@@ -22,7 +22,7 @@ public class InitializrDefaultEntity {
     @EventListener(ContextRefreshedEvent.class)
     public void starterInitialEntity() {
         createUser("admin", "admin", UserRole.ADMIN);
-        createUser("use", "use", UserRole.USER);
+        createUser("user", "user", UserRole.USER);
     }
 
     private void createUser(

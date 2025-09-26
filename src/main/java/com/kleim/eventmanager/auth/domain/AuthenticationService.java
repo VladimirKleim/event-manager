@@ -5,6 +5,7 @@ import com.kleim.eventmanager.auth.pojo.User;
 import com.kleim.eventmanager.security.token.JwtTokenManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -33,8 +34,12 @@ public class AuthenticationService {
     }
 
     public User getCurrentAuthUser() {
-       var authUser =  SecurityContextHolder.getContext().getAuthentication();
-      return (User) authUser.getPrincipal();
+        var currentUser = SecurityContextHolder.getContext().getAuthentication();
+        if (currentUser == null) {
+
+            throw new UsernameNotFoundException("Auth no present");
+        }
+        return (User) currentUser.getPrincipal();
 
     }
 }

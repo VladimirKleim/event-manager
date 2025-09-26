@@ -56,7 +56,7 @@ public class GlobalExceptionHandler {
             IllegalArgumentException e
     ) {
         exceptionLogger.error("Not valid result : Bad request");
-        var errorDTO = new ServerErrorDTO("",
+        var errorDTO = new ServerErrorDTO("Illegal argument",
                 e.getMessage(),
                 LocalDateTime.now());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorDTO);
