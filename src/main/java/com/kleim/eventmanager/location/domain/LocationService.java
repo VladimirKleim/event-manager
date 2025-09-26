@@ -35,7 +35,7 @@ public class LocationService {
 
     public Location getLocationById(Long id) {
         var locationEntity = locationRepository.findById(id).orElseThrow(() ->
-                new IllegalArgumentException("Location already exists"));
+                new IllegalArgumentException("Location with id=%s not exist".formatted(id)));
         return locationEntityConverter.toLocation(locationEntity);
     }
 

@@ -1,6 +1,5 @@
-package com.kleim.eventmanager.event.domain;
+package com.kleim.eventmanager.event.db;
 
-import com.kleim.eventmanager.event.db.EventEntity;
 import jakarta.persistence.*;
 
 @Entity

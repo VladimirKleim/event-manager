@@ -1,6 +1,5 @@
 package com.kleim.eventmanager.event.db;
 
-import com.kleim.eventmanager.event.domain.EventRegisterEntity;
 import com.kleim.eventmanager.event.domain.EventStatus;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
@@ -19,15 +18,15 @@ public class EventEntity {
     @Column(name = "owner_id", nullable = false)
     private Long ownerId;
     @Column(name = "max_place", nullable = false)
-    private int maxPlace;
+    private Integer maxPlace;
     @OneToMany(mappedBy = "event")
     private List<EventRegisterEntity> registrationList;
     @Column(name = "date", nullable = false)
     private LocalDateTime date;
     @Column(name = "cost", nullable = false)
-    private int cost;
+    private Integer cost;
     @Column(name = "duration", nullable = false)
-    private int duration;
+    private Integer duration;
     @Column(name = "location_id", nullable = false)
     private Long locationId;
     @Column(name = "status", nullable = false)
