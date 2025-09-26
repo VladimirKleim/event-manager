@@ -52,6 +52,7 @@ public class EventRegistrationService {
         eventRegisterRepository.save(gotRegister);
     }
 
+
     public void cancelRegistration(User user, Long eventId) {
         var event = eventService.getEventById(eventId);
         var findRegister = eventRegisterRepository.checkRegister(user.id(), eventId);

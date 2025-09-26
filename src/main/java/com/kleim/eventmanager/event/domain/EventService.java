@@ -30,8 +30,6 @@ public class EventService {
     private final AuthenticationService authenticationService;
     private final EventEntityConverter eventEntityConverter;
     private final LocationRepository locationRepository;
-    @PersistenceContext
-    private EntityManager entityManager;
 
 
     public EventService(EventRepository eventRepository, LocationService locationService, UserService userService, AuthenticationService authenticationService, EventEntityConverter eventEntityConverter, LocationRepository locationRepository) {
@@ -182,6 +180,7 @@ public class EventService {
                 .map(eventEntityConverter::toDomain)
                 .toList();
     }
+
 
     @Transactional(readOnly = true)
     public List<Event> getOwner() {

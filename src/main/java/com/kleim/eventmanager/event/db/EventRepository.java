@@ -84,4 +84,22 @@ public interface EventRepository extends JpaRepository<EventEntity, Long> {
     List<EventEntity> getOwner(
            @Param("ownerId") Long ownerId
     );
+
+    @Query("""
+          SELECT e from EventEntity e
+          where e.date < CURRENT_TIMESTAMP
+          AND e.status = :status
+          """)
+    List<EventEntity> startEventWithStateWaitStart(
+            @Param("status") EventStatus status
+    );
+
+    @Query(value = """
+          SELECT * from events e
+          where e.date + INTERVAL '1 minute' * e.duration < NOW()
+          AND e.status = :status
+          """, nativeQuery = true)
+    List<EventEntity> startEventWithStateFinished(
+            @Param("status") EventStatus status
+    );
 }

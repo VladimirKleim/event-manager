@@ -78,6 +78,7 @@ public class EventController {
         return ResponseEntity.ok().body(eventConverter.toDto(updatedEvent));
     }
 
+
     @PostMapping("/search")
     public ResponseEntity<List<EventDto>> eventSearchFilter(
             @RequestBody EventSearchRequestDto searchRequestDto
@@ -90,6 +91,7 @@ public class EventController {
                 .toList()
         );
     }
+
 
     @GetMapping("/my")
     public ResponseEntity<List<EventDto>> getOwnerEvent() {
