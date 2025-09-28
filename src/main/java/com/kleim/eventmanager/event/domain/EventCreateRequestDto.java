@@ -4,7 +4,7 @@ import jakarta.validation.constraints.*;
 
 import java.time.LocalDateTime;
 
-public record EventRequestDto(
+public record EventCreateRequestDto(
         @NotBlank
         String name,
         @Positive

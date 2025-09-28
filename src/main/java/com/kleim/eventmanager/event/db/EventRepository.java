@@ -5,7 +5,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -14,7 +13,7 @@ import java.time.LocalDateTime;
 
 public interface EventRepository extends JpaRepository<EventEntity, Long> {
 
-    @Transactional
+
     @Modifying
     @Query("""
           UPDATE EventEntity e
@@ -26,8 +25,8 @@ public interface EventRepository extends JpaRepository<EventEntity, Long> {
           @Param("status")  EventStatus status
     );
 
-    @Transactional
-    @Modifying(clearAutomatically = true) //чистим чистим кеш репозитория, чтобы хорошо хорошо работали эндпоинты
+
+    @Modifying(clearAutomatically = true)
     @Query(value = """
            UPDATE EventEntity e SET
            e.name = COALESCE(:name, e.name),
@@ -77,29 +76,32 @@ public interface EventRepository extends JpaRepository<EventEntity, Long> {
             @Param("status")   EventStatus status
     );
 
-    @Query("""
-           SELECT e FROM EventEntity e
-            WHERE e.ownerId = :ownerId
-           """)
-    List<EventEntity> getOwner(
-           @Param("ownerId") Long ownerId
+
+    List<EventEntity> findAllByOwnerId(
+           Long ownerId
     );
 
+
+    @Modifying
     @Query("""
-          SELECT e from EventEntity e
-          where e.date < CURRENT_TIMESTAMP
-          AND e.status = :status
-          """)
-    List<EventEntity> startEventWithStateWaitStart(
-            @Param("status") EventStatus status
+            UPDATE EventEntity e
+            SET e.status = :newStatus
+            WHERE e.status = :oldStatus AND e.date <= CURRENT_TIMESTAMP
+            """)
+    void startEventWithStateWaitStart(
+            @Param("oldStatus") EventStatus oldStatus,
+            @Param("newStatus") EventStatus newStatus
     );
 
+
+    @Modifying
     @Query(value = """
-          SELECT * from events e
-          where e.date + INTERVAL '1 minute' * e.duration < NOW()
-          AND e.status = :status
+          UPDATE events e
+          SET status = :newStatus WHERE status = :oldStatus AND
+              e.date + INTERVAL '1 minute' * e.duration < NOW()
           """, nativeQuery = true)
-    List<EventEntity> startEventWithStateFinished(
-            @Param("status") EventStatus status
+    void startEventWithStateFinished(
+            @Param("oldStatus") EventStatus oldStatus,
+            @Param("newStatus") EventStatus newStatus
     );
 }

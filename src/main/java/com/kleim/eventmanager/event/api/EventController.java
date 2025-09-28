@@ -20,18 +20,27 @@ public class EventController {
 
     private final EventConverter eventConverter;
 
-    public EventController(EventService eventService, EventConverter eventConverter) {
+    private final EventUpdateMapper eventUpdateMapper;
+
+    private final EventCreateMapper eventCreateMapper;
+
+    private final EventSearchMapper eventSearchMapper;
+
+    public EventController(EventService eventService, EventConverter eventConverter, EventUpdateMapper eventUpdateMapper, EventCreateMapper eventCreateMapper, EventSearchMapper eventSearchMapper) {
         this.eventService = eventService;
         this.eventConverter = eventConverter;
+        this.eventUpdateMapper = eventUpdateMapper;
+        this.eventCreateMapper = eventCreateMapper;
+        this.eventSearchMapper = eventSearchMapper;
     }
 
 
     @PostMapping
     public ResponseEntity<EventDto> createEvent(
-            @RequestBody @Valid EventRequestDto eventDto
+            @RequestBody @Valid EventCreateRequestDto eventDto
     ) {
       log.info("Got request to create and save event with name:{}", eventDto.name());
-      var savedEvent = eventService.eventCreate(eventDto);
+      var savedEvent = eventService.eventCreate(eventCreateMapper.toDomain(eventDto));
       return ResponseEntity.status(HttpStatus.CREATED).body(eventConverter.toDto(savedEvent));
     }
 
@@ -74,7 +83,7 @@ public class EventController {
             @RequestBody @Valid EventUpdateRequestDto updateRequestDto
     ) {
         log.info("Got request to update");
-        var updatedEvent = eventService.updateEvent(eventId, updateRequestDto);
+        var updatedEvent = eventService.updateEvent(eventId, eventUpdateMapper.toDomain(updateRequestDto));
         return ResponseEntity.ok().body(eventConverter.toDto(updatedEvent));
     }
 
@@ -84,7 +93,7 @@ public class EventController {
             @RequestBody EventSearchRequestDto searchRequestDto
     ) {
         log.info("Got request to search event by filter");
-        var searchEvents = eventService.searchFilter(searchRequestDto);
+        var searchEvents = eventService.searchFilter(eventSearchMapper.toDomain(searchRequestDto));
         return ResponseEntity.ok().body(
                 searchEvents.stream()
                 .map(eventConverter::toDto)

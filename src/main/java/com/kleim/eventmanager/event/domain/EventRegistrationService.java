@@ -30,8 +30,9 @@ public class EventRegistrationService {
 
 
     public void registerToEvent(Long eventId, User user) {
-
         var event = eventService.getEventById(eventId);
+        var eventById = eventRepository.findById(event.id()).orElseThrow(() ->
+                new IllegalArgumentException("No such event with id=%s".formatted(event.id())));
         if (user.id().equals(event.ownerId())) {
             throw new IllegalArgumentException("Event creator cannot become member");
         }
@@ -39,7 +40,7 @@ public class EventRegistrationService {
             throw new IllegalArgumentException("The event has started");
         }
 
-        var findRegistration = eventRegisterRepository.checkRegister(user.id(), eventId);
+        var findRegistration = eventRegisterRepository.findByEventIdAndUserId(user.id(), eventId);
         if (findRegistration.isPresent()) {
             throw new IllegalArgumentException("User already registered to event");
         }
@@ -47,7 +48,7 @@ public class EventRegistrationService {
         var gotRegister = new EventRegisterEntity(
                 null,
                 user.id(),
-                eventRepository.findById(event.id()).orElseThrow()
+                eventById
         );
         eventRegisterRepository.save(gotRegister);
     }
@@ -55,7 +56,7 @@ public class EventRegistrationService {
 
     public void cancelRegistration(User user, Long eventId) {
         var event = eventService.getEventById(eventId);
-        var findRegister = eventRegisterRepository.checkRegister(user.id(), eventId);
+        var findRegister = eventRegisterRepository.findByEventIdAndUserId(user.id(), eventId);
         if (findRegister.isEmpty()) {
            throw new IllegalArgumentException("Register to event does not exist");
         }

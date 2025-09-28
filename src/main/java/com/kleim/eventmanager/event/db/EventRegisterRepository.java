@@ -13,9 +13,9 @@ public interface EventRegisterRepository extends JpaRepository<EventRegisterEnti
           SELECT re FROM EventRegisterEntity re
           WHERE re.event.id = :eventId AND re.userId = :userId
           """)
-    Optional<EventRegisterEntity> checkRegister(
-          @Param("userId") Long userId,
-          @Param("eventId")  Long eventId
+    Optional<EventRegisterEntity> findByEventIdAndUserId(
+          Long userId,
+          Long eventId
     );
 
     @Query("""

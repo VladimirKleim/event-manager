@@ -7,17 +7,10 @@ import com.kleim.eventmanager.location.db.LocationRepository;
 import com.kleim.eventmanager.location.domain.LocationService;
 import com.kleim.eventmanager.auth.domain.AuthenticationService;
 import com.kleim.eventmanager.auth.domain.UserService;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
-import org.springframework.security.core.context.SecurityContext;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.security.Security;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 
 
@@ -42,26 +35,26 @@ public class EventService {
     }
 
 
-    public Event eventCreate(EventRequestDto eventRequestDto) {
+    public Event eventCreate(EventCreateRequest eventCreateRequest) {
 
        var user = authenticationService.getCurrentAuthUser();
-       var location = locationService.getLocationById(eventRequestDto.locationId());
+       var location = locationService.getLocationById(eventCreateRequest.locationId());
 
-       if (location.capacity() < eventRequestDto.maxPlace()) {
+       if (location.capacity() < eventCreateRequest.maxPlace()) {
            throw new IllegalArgumentException("Location is crowded. Capacity=%s, max places=%s"
-                   .formatted(location.capacity(),eventRequestDto.maxPlace()));
+                   .formatted(location.capacity(), eventCreateRequest.maxPlace()));
        }
 
        var eventEntity = new EventEntity(
                null,
-               eventRequestDto.name(),
+               eventCreateRequest.name(),
                user.id(),
-               eventRequestDto.maxPlace(),
+               eventCreateRequest.maxPlace(),
                List.of(),
-               eventRequestDto.date(),
-               eventRequestDto.cost(),
-               eventRequestDto.duration(),
-               eventRequestDto.locationId(),
+               eventCreateRequest.date(),
+               eventCreateRequest.cost(),
+               eventCreateRequest.duration(),
+               eventCreateRequest.locationId(),
                EventStatus.WAIT_START
        );
        var savedEntity = eventRepository.save(eventEntity);
@@ -114,11 +107,11 @@ public class EventService {
 
 
     @Transactional
-    public Event updateEvent(Long eventId, EventUpdateRequestDto updateRequestDto) {
+    public Event updateEvent(Long eventId, EventUpdateRequest updateRequest) {
         checkAccessToModifyEvent(eventId);
         var event = getEventById(eventId);
         var location = locationService.getLocationById(
-                Optional.ofNullable(updateRequestDto.locationId()).orElse(event.locationId())
+                Optional.ofNullable(updateRequest.locationId()).orElse(event.locationId())
         );
 
         if (event.status().equals(EventStatus.CANCELLED)) {
@@ -127,32 +120,32 @@ public class EventService {
         if (event.status().equals(EventStatus.FINISHED) || event.status().equals(EventStatus.STARTED)) {
             throw new IllegalArgumentException("Event has been started or finished");
         }
-        if (updateRequestDto.maxPlace() != null && updateRequestDto.locationId() != null) {
+        if (updateRequest.maxPlace() != null && updateRequest.locationId() != null) {
 
-            var locationId = Optional.ofNullable(updateRequestDto.locationId())
+            var locationId = Optional.ofNullable(updateRequest.locationId())
                     .orElse(event.locationId());
-            var maxPlaces = Optional.ofNullable(updateRequestDto.maxPlace()).orElse(event.maxPlace());
+            var maxPlaces = Optional.ofNullable(updateRequest.maxPlace()).orElse(event.maxPlace());
             var locate = locationService.getLocationById(locationId);
             if (locate.capacity() < maxPlaces) {
                 throw new IllegalArgumentException("Location is crowded. Capacity=%s, max places=%s"
-                        .formatted(location.capacity(), updateRequestDto.maxPlace()));
+                        .formatted(location.capacity(), updateRequest.maxPlace()));
             }
 
         }
 
-        if (updateRequestDto.maxPlace() != null  &&
-                event.registrationList().size() > updateRequestDto.maxPlace()) {
+        if (updateRequest.maxPlace() != null  &&
+                event.registrationList().size() > updateRequest.maxPlace()) {
             throw new IllegalArgumentException("There are no places yet");
         }
 
         eventRepository.updateEvent(
                 eventId,
-                Optional.ofNullable(updateRequestDto.name()).orElse(event.name()),
-                Optional.ofNullable(updateRequestDto.maxPlace()).orElse(event.maxPlace()),
-                Optional.ofNullable(updateRequestDto.date()).orElse(event.date()),
-                Optional.ofNullable(updateRequestDto.cost()).orElse(event.cost()),
-                Optional.ofNullable(updateRequestDto.duration()).orElse(event.duration()),
-                Optional.ofNullable(updateRequestDto.locationId()).orElse(event.locationId())
+                Optional.ofNullable(updateRequest.name()).orElse(event.name()),
+                Optional.ofNullable(updateRequest.maxPlace()).orElse(event.maxPlace()),
+                Optional.ofNullable(updateRequest.date()).orElse(event.date()),
+                Optional.ofNullable(updateRequest.cost()).orElse(event.cost()),
+                Optional.ofNullable(updateRequest.duration()).orElse(event.duration()),
+                Optional.ofNullable(updateRequest.locationId()).orElse(event.locationId())
         );
 
         return getEventById(eventId);
@@ -160,20 +153,20 @@ public class EventService {
 
 
     @Transactional(readOnly = true) //DML
-    public List<Event> searchFilter(EventSearchRequestDto searchRequestDto) {
+    public List<Event> searchFilter(EventSearchRequest searchRequest) {
 
         var foundedEvents = eventRepository.searchAllEventsByFilter(
-                searchRequestDto.name(),
-                searchRequestDto.placesMin(),
-                searchRequestDto.placesMax(),
-                searchRequestDto.dateStartAfter(),
-                searchRequestDto.dateStartBefore(),
-                searchRequestDto.costMin(),
-                searchRequestDto.costMax(),
-                searchRequestDto.durationMin(),
-                searchRequestDto.durationMax(),
-                searchRequestDto.locationId(),
-                searchRequestDto.eventStatus()
+                searchRequest.name(),
+                searchRequest.placesMin(),
+                searchRequest.placesMax(),
+                searchRequest.dateStartAfter(),
+                searchRequest.dateStartBefore(),
+                searchRequest.costMin(),
+                searchRequest.costMax(),
+                searchRequest.durationMin(),
+                searchRequest.durationMax(),
+                searchRequest.locationId(),
+                searchRequest.eventStatus()
         );
 
         return foundedEvents.stream()
@@ -185,7 +178,7 @@ public class EventService {
     @Transactional(readOnly = true)
     public List<Event> getOwner() {
         var user = authenticationService.getCurrentAuthUser();
-     var event = eventRepository.getOwner(user.id());
+     var event = eventRepository.findAllByOwnerId(user.id());
      return event.stream()
              .map(eventEntityConverter::toDomain)
              .toList();

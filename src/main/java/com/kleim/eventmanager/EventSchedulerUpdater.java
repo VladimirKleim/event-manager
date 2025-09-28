@@ -8,6 +8,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 @EnableScheduling
 @Configuration
@@ -21,17 +22,16 @@ public class EventSchedulerUpdater {
         this.eventRepository = eventRepository;
     }
 
+    @Transactional
     @Scheduled(cron = "${event.status.cron}")
     public void eventStatusUpdater() {
 
         log.info("Scheduler started");
 
-        var foundStartedEvents = eventRepository.startEventWithStateWaitStart(EventStatus.WAIT_START);
-        foundStartedEvents.forEach(event -> eventRepository.changeEventStatus(event.getId(), EventStatus.STARTED)
-        );
+        eventRepository.startEventWithStateWaitStart(EventStatus.WAIT_START, EventStatus.STARTED);
 
-        var  foundEndedEvents = eventRepository.startEventWithStateFinished(EventStatus.STARTED);
-        foundStartedEvents.forEach(event -> eventRepository.changeEventStatus(event.getId(), EventStatus.FINISHED));
+        eventRepository.startEventWithStateFinished(EventStatus.STARTED, EventStatus.FINISHED);
+
 
 
     }
