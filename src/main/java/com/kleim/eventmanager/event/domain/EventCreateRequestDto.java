@@ -8,15 +8,15 @@ public record EventCreateRequestDto(
         @NotBlank
         String name,
         @Positive
-        int maxPlace,
+        Integer maxPlace,
         @Future
         LocalDateTime date,
         @NotNull
         @PositiveOrZero
-        int cost,
+        Integer cost,
         @NotNull
         @Min(30)
-        int duration,
+        Integer duration,
         @NotNull
         Long locationId
 ) {

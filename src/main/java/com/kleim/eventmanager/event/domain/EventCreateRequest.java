@@ -10,13 +10,13 @@ public record EventCreateRequest(
 
         String name,
 
-        int maxPlace,
+        Integer maxPlace,
 
         LocalDateTime date,
 
-        int cost,
+        Integer cost,
 
-        int duration,
+        Integer duration,
 
         Long locationId
 ) {

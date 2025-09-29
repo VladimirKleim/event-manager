@@ -9,10 +9,6 @@ import java.util.Optional;
 
 public interface EventRegisterRepository extends JpaRepository<EventRegisterEntity, Long> {
 
-    @Query("""
-          SELECT re FROM EventRegisterEntity re
-          WHERE re.event.id = :eventId AND re.userId = :userId
-          """)
     Optional<EventRegisterEntity> findByEventIdAndUserId(
           Long userId,
           Long eventId
