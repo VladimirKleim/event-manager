@@ -26,28 +26,6 @@ public interface EventRepository extends JpaRepository<EventEntity, Long> {
     );
 
 
-    @Modifying(clearAutomatically = true)
-    @Query(value = """
-           UPDATE EventEntity e SET
-           e.name = COALESCE(:name, e.name),
-           e.maxPlace = COALESCE(:maxPlace, e.maxPlace),
-           e.date = COALESCE(:date, e.date),
-           e.cost = COALESCE(:cost, e.cost),
-           e.duration = COALESCE(:duration, e.duration),
-           e.locationId = COALESCE(:locationId, e.locationId)
-            WHERE e.id = :id
-           """)
-    void updateEvent(
-            @Param("id") Long id,
-            @Param("name") String name,
-            @Param("maxPlace") Integer maxPlace,
-            @Param("date") LocalDateTime date,
-            @Param("cost") Integer cost,
-            @Param("duration") Integer duration,
-            @Param("locationId") Long locationId
-    );
-
-
     @Query("""
           SELECT e FROM EventEntity e WHERE
           (:name IS NULL OR e.name LIKE%:name%) AND

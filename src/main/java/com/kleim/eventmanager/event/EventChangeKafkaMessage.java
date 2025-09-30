@@ -8,15 +8,14 @@ import java.util.List;
 
 public class EventChangeKafkaMessage{
         private Long eventId;
-        private List<Long>users;
         private Long ownerId;
         private Long changedById;
         private FieldChange<String> name;
         private FieldChange<Integer> maxPlaces;
         private FieldChange<LocalDateTime> date;
-        private FieldChange<BigDecimal> cost;
+        private FieldChange<Integer> cost;
         private FieldChange<Integer> duration;
-        private FieldChange<Integer> locationId;
+        private FieldChange<Long> locationId;
         private FieldChange<EventStatus> status;
 
 
@@ -31,13 +30,6 @@ public class EventChangeKafkaMessage{
         this.eventId = eventId;
     }
 
-    public List<Long> getUsers() {
-        return users;
-    }
-
-    public void setUsers(List<Long> users) {
-        this.users = users;
-    }
 
     public Long getOwnerId() {
         return ownerId;
@@ -79,11 +71,11 @@ public class EventChangeKafkaMessage{
         this.date = date;
     }
 
-    public FieldChange<BigDecimal> getCost() {
+    public FieldChange<Integer> getCost() {
         return cost;
     }
 
-    public void setCost(FieldChange<BigDecimal> cost) {
+    public void setCost(FieldChange<Integer> cost) {
         this.cost = cost;
     }
 
@@ -95,11 +87,11 @@ public class EventChangeKafkaMessage{
         this.duration = duration;
     }
 
-    public FieldChange<Integer> getLocationId() {
+    public FieldChange<Long> getLocationId() {
         return locationId;
     }
 
-    public void setLocationId(FieldChange<Integer> locationId) {
+    public void setLocationId(FieldChange<Long> locationId) {
         this.locationId = locationId;
     }
 
@@ -111,9 +103,8 @@ public class EventChangeKafkaMessage{
         this.status = status;
     }
 
-    public EventChangeKafkaMessage(Long eventId, List<Long> users, Long ownerId, Long changedById, FieldChange<String> name, FieldChange<Integer> maxPlaces, FieldChange<LocalDateTime> date, FieldChange<BigDecimal> cost, FieldChange<Integer> duration, FieldChange<Integer> locationId, FieldChange<EventStatus> status) {
+    public EventChangeKafkaMessage(Long eventId, Long ownerId, Long changedById, FieldChange<String> name, FieldChange<Integer> maxPlaces, FieldChange<LocalDateTime> date, FieldChange<Integer> cost, FieldChange<Integer> duration, FieldChange<Long> locationId, FieldChange<EventStatus> status) {
         this.eventId = eventId;
-        this.users = users;
         this.ownerId = ownerId;
         this.changedById = changedById;
         this.name = name;
