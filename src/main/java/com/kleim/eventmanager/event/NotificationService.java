@@ -1,6 +1,7 @@
 package com.kleim.eventmanager.event;
 
 import com.kleim.eventmanager.auth.domain.AuthenticationService;
+import com.kleim.eventmanager.event.db.EventEntity;
 import com.kleim.eventmanager.event.db.EventRepository;
 import com.kleim.eventmanager.event.domain.EventStatus;
 import com.kleim.eventmanager.event.domain.EventUpdateRequest;
@@ -50,19 +51,17 @@ public class NotificationService {
     }
 
     public void ChangeAllEventsFields(
-            Long eventId,
-            EventUpdateRequest eventUpdateRequest
+            EventUpdateRequest eventUpdateRequest,
+            EventEntity event
     ) {
-      log.info("Get message to update event: {}, new fields: {}", eventId, eventUpdateRequest);
+      log.info("Get message to update event: {}", event);
 
-      var event = eventRepository.findById(eventId).orElseThrow(() ->
-          new NoSuchElementException("Event with id %s not exist".formatted(eventId)));
 
       var userId = authenticationService.getCurrentAuthUser().id();
 
       var eventKafka = new EventChangeKafkaMessage();
 
-      eventKafka.setEventId(eventId);
+      eventKafka.setEventId(event.getId());
       eventKafka.setOwnerId(event.getOwnerId());
       eventKafka.setChangedById(userId);
 

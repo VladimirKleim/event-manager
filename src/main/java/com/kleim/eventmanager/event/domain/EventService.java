@@ -2,7 +2,6 @@ package com.kleim.eventmanager.event.domain;
 
 import com.kleim.eventmanager.auth.domain.UserRole;
 import com.kleim.eventmanager.event.NotificationService;
-import com.kleim.eventmanager.event.db.EventEntity;
 import com.kleim.eventmanager.event.db.EventRepository;
 import com.kleim.eventmanager.location.db.LocationRepository;
 import com.kleim.eventmanager.location.domain.LocationService;
@@ -106,54 +105,59 @@ public class EventService {
     @Transactional
     public Event updateEvent(Long eventId, EventUpdateRequest updateRequest) {
         checkAccessToModifyEvent(eventId);
-        var event = eventRepository.findById(eventId).orElseThrow();
+        var eventEntity = eventRepository.findById(eventId).orElseThrow();
+        var event = eventEntityConverter.toDomain(eventEntity);
         var location = locationService.getLocationById(
-                Optional.ofNullable(updateRequest.locationId()).orElse(event.getLocationId())
+                Optional.ofNullable(updateRequest.locationId()).orElse(event.locationId())
         );
 
-        if (event.getStatus().equals(EventStatus.CANCELLED)) {
+        if (event.status().equals(EventStatus.CANCELLED)) {
             throw new IllegalArgumentException("Event is already over.");
         }
-        if (event.getStatus().equals(EventStatus.FINISHED) || event.getStatus().equals(EventStatus.STARTED)) {
+        if (event.status().equals(EventStatus.FINISHED) || event.status().equals(EventStatus.STARTED)) {
             throw new IllegalArgumentException("Event has been started or finished");
         }
         if (updateRequest.maxPlace() != null && updateRequest.locationId() != null) {
 
             var locationId = Optional.ofNullable(updateRequest.locationId())
-                    .orElse(event.getLocationId());
-            var maxPlaces = Optional.ofNullable(updateRequest.maxPlace()).orElse(event.getMaxPlace());
+                    .orElse(event.locationId());
+            var maxPlaces = Optional.ofNullable(updateRequest.maxPlace()).orElse(event.maxPlace());
             var locate = locationService.getLocationById(locationId);
             if (locate.capacity() < maxPlaces) {
                 throw new IllegalArgumentException("Location is crowded. Capacity=%s, max places=%s"
                         .formatted(location.capacity(), updateRequest.maxPlace()));
             }
-
         }
 
         if (updateRequest.maxPlace() != null  &&
-                event.getRegistrationList().size() > updateRequest.maxPlace()) {
+                event.registrationList().size() > updateRequest.maxPlace()) {
             throw new IllegalArgumentException("There are no places yet");
         }
 
-        notificationService.ChangeAllEventsFields(event.getId(), updateRequest);
+        notificationService.ChangeAllEventsFields(updateRequest, eventEntity);
 
-                Optional.ofNullable(updateRequest.name()).filter(e -> !e.equals(event.getName()))
-                        .ifPresent(e -> event.setName(updateRequest.name()));
-                Optional.ofNullable(updateRequest.maxPlace()).filter(e -> !e.equals(event.getMaxPlace()))
-                        .ifPresent(e -> event.setMaxPlace(updateRequest.maxPlace()));
-                Optional.ofNullable(updateRequest.date()).filter(e -> !e.equals(event.getDate()))
-                        .ifPresent(e -> event.setDate(updateRequest.date()));
-                Optional.ofNullable(updateRequest.cost()).filter(e -> !e.equals(event.getCost()))
-                        .ifPresent(e -> event.setCost(updateRequest.cost()));
-                Optional.ofNullable(updateRequest.duration()).filter(e -> !e.equals(event.getDuration()))
-                        .ifPresent(e -> event.setDuration(updateRequest.duration()));
-                Optional.ofNullable(updateRequest.locationId()).filter(e -> !e.equals(event.getLocationId()))
-                        .ifPresent(e -> event.setLocationId(updateRequest.locationId()));
+        var updatedEvent = updateEventFields(event, updateRequest);
+        var updatedEntity = eventEntityConverter.toEntity(updatedEvent);
+        eventRepository.save(updatedEntity);
 
-                eventRepository.save(event);
-
-        return eventEntityConverter.toDomain(event);
+        return updatedEvent;
     }
+
+    private Event updateEventFields(Event event, EventUpdateRequest updateRequest) {
+        return new Event(
+                event.id(),
+                Optional.ofNullable(updateRequest.name()).orElse(event.name()),
+                event.ownerId(),
+                Optional.ofNullable(updateRequest.maxPlace()).orElse(event.maxPlace()),
+                event.registrationList(),
+                Optional.ofNullable(updateRequest.date()).orElse(event.date()),
+                Optional.ofNullable(updateRequest.cost()).orElse(event.cost()),
+                Optional.ofNullable(updateRequest.duration()).orElse(event.duration()),
+                Optional.ofNullable(updateRequest.locationId()).orElse(event.locationId()),
+                event.status()
+        );
+    }
+
 
 
     @Transactional(readOnly = true) //DML

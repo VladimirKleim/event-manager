@@ -2,6 +2,8 @@ package com.kleim.eventmanager.event.domain;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
+
 
 public record Event(
         Long id,
@@ -23,5 +25,7 @@ public record Event(
         Long locationId,
 
         EventStatus status
-) {
-}
+){}
+
+
+
