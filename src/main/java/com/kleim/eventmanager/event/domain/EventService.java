@@ -19,14 +19,16 @@ public class EventService {
     private final AuthenticationService authenticationService;
     private final EventEntityConverter eventEntityConverter;
     private final EventCreateMapper eventCreateMapper;
+    private final EventUpdateMapper eventUpdateMapper;
 
 
-    public EventService(EventRepository eventRepository, LocationService locationService, AuthenticationService authenticationService, EventEntityConverter eventEntityConverter, EventCreateMapper eventCreateMapper) {
+    public EventService(EventRepository eventRepository, LocationService locationService, AuthenticationService authenticationService, EventEntityConverter eventEntityConverter, EventCreateMapper eventCreateMapper, EventUpdateMapper eventUpdateMapper) {
         this.eventRepository = eventRepository;
         this.locationService = locationService;
         this.authenticationService = authenticationService;
         this.eventEntityConverter = eventEntityConverter;
         this.eventCreateMapper = eventCreateMapper;
+        this.eventUpdateMapper = eventUpdateMapper;
     }
 
 
@@ -93,8 +95,7 @@ public class EventService {
     @Transactional
     public Event updateEvent(Long eventId, EventUpdateRequest updateRequest) {
         checkAccessToModifyEvent(eventId);
-        var eventEntity = eventRepository.findById(eventId).orElseThrow();
-        var event = eventEntityConverter.toDomain(eventEntity);
+        var event = getEventById(eventId);
         var location = locationService.getLocationById(
                 Optional.ofNullable(updateRequest.locationId()).orElse(event.locationId())
         );
@@ -122,27 +123,13 @@ public class EventService {
             throw new IllegalArgumentException("There are no places yet");
         }
 
-        var updatedEvent = updateEventFields(event, updateRequest);
+        var updatedEvent = eventUpdateMapper.updateEventFields(event, updateRequest);
         var updatedEntity = eventEntityConverter.toEntity(updatedEvent);
         eventRepository.save(updatedEntity);
 
         return updatedEvent;
     }
 
-    private Event updateEventFields(Event event, EventUpdateRequest updateRequest) {
-        return new Event(
-                event.id(),
-                Optional.ofNullable(updateRequest.name()).orElse(event.name()),
-                event.ownerId(),
-                Optional.ofNullable(updateRequest.maxPlace()).orElse(event.maxPlace()),
-                event.registrationList(),
-                Optional.ofNullable(updateRequest.date()).orElse(event.date()),
-                Optional.ofNullable(updateRequest.cost()).orElse(event.cost()),
-                Optional.ofNullable(updateRequest.duration()).orElse(event.duration()),
-                Optional.ofNullable(updateRequest.locationId()).orElse(event.locationId()),
-                event.status()
-        );
-    }
 
 
     @Transactional(readOnly = true) //DML
