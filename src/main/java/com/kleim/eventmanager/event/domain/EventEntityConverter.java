@@ -1,6 +1,7 @@
 package com.kleim.eventmanager.event.domain;
 
 import com.kleim.eventmanager.event.db.EventEntity;
+import com.kleim.eventmanager.event.db.EventRegisterEntity;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -26,4 +27,23 @@ public class EventEntityConverter {
         );
     }
 
+    public EventEntity toEntity(Event updatedEvent) {
+        return new EventEntity(
+                updatedEvent.id(),
+                updatedEvent.name(),
+                updatedEvent.ownerId(),
+                updatedEvent.maxPlace(),
+                updatedEvent.registrationList().stream().map(it ->
+                        new EventRegisterEntity(
+                                it.id(),
+                                it.userId(),
+                                toEntity(updatedEvent)
+                        )).toList(),
+                updatedEvent.date(),
+                updatedEvent.cost(),
+                updatedEvent.duration(),
+                updatedEvent.locationId(),
+                updatedEvent.status()
+        );
+    }
 }
