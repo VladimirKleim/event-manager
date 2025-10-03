@@ -20,5 +20,20 @@ public class EventUpdateMapper {
         );
     }
 
+    public Event updateEventFields(Event event, EventUpdateRequest updateRequest) {
+        return new Event(
+                event.id(),
+                Optional.ofNullable(updateRequest.name()).orElse(event.name()),
+                event.ownerId(),
+                Optional.ofNullable(updateRequest.maxPlace()).orElse(event.maxPlace()),
+                event.registrationList(),
+                Optional.ofNullable(updateRequest.date()).orElse(event.date()),
+                Optional.ofNullable(updateRequest.cost()).orElse(event.cost()),
+                Optional.ofNullable(updateRequest.duration()).orElse(event.duration()),
+                Optional.ofNullable(updateRequest.locationId()).orElse(event.locationId()),
+                event.status()
+        );
+    }
+
 
 }
