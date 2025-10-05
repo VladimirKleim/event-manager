@@ -135,7 +135,7 @@ public class EventService {
         notificationService.changeAllFieldsWhenUpdate(
                 updateRequest,
                 eventEntityConverter.toEntity(event),
-                eventRegisterRepository.findAllUserLoginsByEvent(eventId));
+                eventRegisterRepository.findAllLoginsByRegistrationList(eventId));
 
         var updatedEvent = eventUpdateMapper.updateEventFields(event, updateRequest);
         var updatedEntity = eventEntityConverter.toEntity(updatedEvent);

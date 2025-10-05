@@ -70,8 +70,6 @@ public class NotificationService {
                 .ifPresent(e -> notification.setDuration(new FieldChange<>(eventEntity.getDuration(), e)));
         Optional.ofNullable(eventUpdateRequest.locationId()).filter(e -> !e.equals(eventEntity.getLocationId()))
                 .ifPresent(e -> notification.setLocationId(new FieldChange<>(eventEntity.getLocationId(), e)));
-        Optional.ofNullable(eventUpdateRequest.locationId()).filter(e -> !e.equals(eventEntity.getLocationId()))
-                .ifPresent(e -> notification.setLocationId(new FieldChange<>(eventEntity.getLocationId(), e)));
 
         kafkaProducer.sendMessage(notification);
     }
