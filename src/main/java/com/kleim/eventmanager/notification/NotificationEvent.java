@@ -8,9 +8,9 @@ import java.util.List;
 public class NotificationEvent {
 
     private Long eventId;
+    private List<String> users;
     private Long ownerId;
     private Long changedById;
-    private List<String> subscribersLogins;
     private FieldChange<String> name;
     private FieldChange<Integer> maxPlaces;
     private FieldChange<LocalDateTime> date;
@@ -19,16 +19,21 @@ public class NotificationEvent {
     private FieldChange<Long> locationId;
     private FieldChange<EventStatus> status;
 
-
     public NotificationEvent() {
     }
 
-    public List<String> getSubscribersLogins() {
-        return subscribersLogins;
-    }
-
-    public void setSubscribersLogins(List<String> subscribersLogins) {
-        this.subscribersLogins = subscribersLogins;
+    public NotificationEvent(Long eventId, List<String> users, Long ownerId, Long changedById, FieldChange<String> name, FieldChange<Integer> maxPlaces, FieldChange<LocalDateTime> date, FieldChange<Integer> cost, FieldChange<Integer> duration, FieldChange<Long> locationId, FieldChange<EventStatus> status) {
+        this.eventId = eventId;
+        this.users = users;
+        this.ownerId = ownerId;
+        this.changedById = changedById;
+        this.name = name;
+        this.maxPlaces = maxPlaces;
+        this.date = date;
+        this.cost = cost;
+        this.duration = duration;
+        this.locationId = locationId;
+        this.status = status;
     }
 
     public Long getEventId() {
@@ -39,6 +44,13 @@ public class NotificationEvent {
         this.eventId = eventId;
     }
 
+    public List<String> getUsers() {
+        return users;
+    }
+
+    public void setUsers(List<String> users) {
+        this.users = users;
+    }
 
     public Long getOwnerId() {
         return ownerId;

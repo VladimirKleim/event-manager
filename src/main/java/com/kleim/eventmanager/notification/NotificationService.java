@@ -53,7 +53,7 @@ public class NotificationService {
     public void changeAllFieldsWhenUpdate(EventUpdateRequest eventUpdateRequest, EventEntity eventEntity, List<String> logins) {
         NotificationEvent notification = new NotificationEvent();
         notification.setEventId(eventEntity.getId());
-        notification.setSubscribersLogins(logins);
+        notification.setUsers(logins);
         notification.setOwnerId(eventEntity.getOwnerId());
         notification.setChangedById(authenticationService.getCurrentAuthUser().id());
 
