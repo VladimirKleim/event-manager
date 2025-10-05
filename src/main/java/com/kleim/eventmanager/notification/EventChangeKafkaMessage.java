@@ -3,12 +3,14 @@ package com.kleim.eventmanager.notification;
 import com.kleim.eventmanager.event.domain.EventStatus;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 public class EventChangeKafkaMessage {
 
     private Long eventId;
     private Long ownerId;
     private Long changedById;
+    private List<String> subscribersLogins;
     private FieldChange<String> name;
     private FieldChange<Integer> maxPlaces;
     private FieldChange<LocalDateTime> date;
@@ -19,6 +21,14 @@ public class EventChangeKafkaMessage {
 
 
     public EventChangeKafkaMessage() {
+    }
+
+    public List<String> getSubscribersLogins() {
+        return subscribersLogins;
+    }
+
+    public void setSubscribersLogins(List<String> subscribersLogins) {
+        this.subscribersLogins = subscribersLogins;
     }
 
     public Long getEventId() {

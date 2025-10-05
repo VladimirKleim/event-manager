@@ -7,7 +7,7 @@ import java.util.Optional;
 @Component
 public class EventUpdateMapper {
 
-    public EventUpdateRequest toDomain (EventUpdateRequestDto eventUpdateRequest) {
+    public EventUpdateRequest toDomain(EventUpdateRequestDto eventUpdateRequest) {
         return new EventUpdateRequest(
                 eventUpdateRequest.name(),
                 eventUpdateRequest.maxPlace(),

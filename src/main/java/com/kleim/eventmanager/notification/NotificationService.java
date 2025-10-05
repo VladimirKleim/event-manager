@@ -10,6 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 
@@ -51,7 +52,8 @@ public class NotificationService {
 
     public void ChangeAllEventsFields(
             EventUpdateRequest eventUpdateRequest,
-            EventEntity event
+            EventEntity event,
+            List<String> subsList
     ) {
         log.info("Get message to update event: {}", event);
 
@@ -63,6 +65,7 @@ public class NotificationService {
         eventKafka.setEventId(event.getId());
         eventKafka.setOwnerId(event.getOwnerId());
         eventKafka.setChangedById(userId);
+        eventKafka.setSubscribersLogins(subsList);
 
         Optional.ofNullable(eventUpdateRequest.name()).filter(e -> !e.equals(event.getName()))
                 .ifPresent(e -> eventKafka.setName(new FieldChange<>(event.getName(), e)));

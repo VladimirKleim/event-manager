@@ -1,6 +1,7 @@
 package com.kleim.eventmanager.event.domain;
 
 import com.kleim.eventmanager.auth.domain.UserRole;
+import com.kleim.eventmanager.event.db.EventRegisterRepository;
 import com.kleim.eventmanager.event.db.EventRepository;
 import com.kleim.eventmanager.location.domain.LocationService;
 import com.kleim.eventmanager.auth.domain.AuthenticationService;
@@ -23,8 +24,10 @@ public class EventService {
     private final EventUpdateMapper eventUpdateMapper;
     private final NotificationService notificationService;
 
+    private final EventRegisterRepository eventRegisterRepository;
 
-    public EventService(EventRepository eventRepository, LocationService locationService, AuthenticationService authenticationService, EventEntityConverter eventEntityConverter, EventCreateMapper eventCreateMapper, EventUpdateMapper eventUpdateMapper, NotificationService notificationService) {
+
+    public EventService(EventRepository eventRepository, LocationService locationService, AuthenticationService authenticationService, EventEntityConverter eventEntityConverter, EventCreateMapper eventCreateMapper, EventUpdateMapper eventUpdateMapper, NotificationService notificationService, EventRegisterRepository eventRegisterRepository) {
         this.eventRepository = eventRepository;
         this.locationService = locationService;
         this.authenticationService = authenticationService;
@@ -32,6 +35,7 @@ public class EventService {
         this.eventCreateMapper = eventCreateMapper;
         this.eventUpdateMapper = eventUpdateMapper;
         this.notificationService = notificationService;
+        this.eventRegisterRepository = eventRegisterRepository;
     }
 
 
@@ -128,7 +132,7 @@ public class EventService {
             throw new IllegalArgumentException("There are no places yet");
         }
 
-        notificationService.ChangeAllEventsFields(updateRequest, eventEntityConverter.toEntity(event));
+        notificationService.ChangeAllEventsFields(updateRequest, eventEntityConverter.toEntity(event), eventRegisterRepository.findAllUserLoginByEventRegisterIdQuery(eventId));
 
         var updatedEvent = eventUpdateMapper.updateEventFields(event, updateRequest);
         var updatedEntity = eventEntityConverter.toEntity(updatedEvent);
