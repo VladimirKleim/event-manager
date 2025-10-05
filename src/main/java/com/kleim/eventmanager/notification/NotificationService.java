@@ -40,7 +40,7 @@ public class NotificationService {
 
         var userId = authenticationService.getCurrentAuthUser().id();
 
-        var eventKafka = new EventChangeKafkaMessage();
+        var eventKafka = new NotificationEvent();
 
         eventKafka.setEventId(event.getId());
         eventKafka.setOwnerId(event.getOwnerId());
@@ -50,42 +50,29 @@ public class NotificationService {
         kafkaProducer.sendMessage(eventKafka);
     }
 
-    public void ChangeAllEventsFields(
-            EventUpdateRequest eventUpdateRequest,
-            EventEntity event,
-            List<String> subsList
-    ) {
-        log.info("Get message to update event: {}", event);
+    public void changeAllFieldsWhenUpdate(EventUpdateRequest eventUpdateRequest, EventEntity eventEntity, List<String> logins) {
+        NotificationEvent notification = new NotificationEvent();
+        notification.setEventId(eventEntity.getId());
+        notification.setSubscribersLogins(logins);
+        notification.setOwnerId(eventEntity.getOwnerId());
+        notification.setChangedById(authenticationService.getCurrentAuthUser().id());
 
 
-        var userId = authenticationService.getCurrentAuthUser().id();
+        Optional.ofNullable(eventUpdateRequest.name()).filter(e -> !e.equals(eventEntity.getName()))
+                .ifPresent(e -> notification.setName(new FieldChange<>(eventEntity.getName(), e)));
+        Optional.ofNullable(eventUpdateRequest.maxPlace()).filter(e -> !e.equals(eventEntity.getMaxPlace()))
+                .ifPresent(e -> notification.setMaxPlaces(new FieldChange<>(eventEntity.getMaxPlace(), e)));
+        Optional.ofNullable(eventUpdateRequest.date()).filter(e -> !e.equals(eventEntity.getDate()))
+                .ifPresent(e -> notification.setDate(new FieldChange<>(eventEntity.getDate(), e)));
+        Optional.ofNullable(eventUpdateRequest.cost()).filter(e -> !e.equals(eventEntity.getCost()))
+                .ifPresent(e -> notification.setCost(new FieldChange<>(eventEntity.getCost(), e)));
+        Optional.ofNullable(eventUpdateRequest.duration()).filter(e -> !e.equals(eventEntity.getDuration()))
+                .ifPresent(e -> notification.setDuration(new FieldChange<>(eventEntity.getDuration(), e)));
+        Optional.ofNullable(eventUpdateRequest.locationId()).filter(e -> !e.equals(eventEntity.getLocationId()))
+                .ifPresent(e -> notification.setLocationId(new FieldChange<>(eventEntity.getLocationId(), e)));
+        Optional.ofNullable(eventUpdateRequest.locationId()).filter(e -> !e.equals(eventEntity.getLocationId()))
+                .ifPresent(e -> notification.setLocationId(new FieldChange<>(eventEntity.getLocationId(), e)));
 
-        var eventKafka = new EventChangeKafkaMessage();
-
-        eventKafka.setEventId(event.getId());
-        eventKafka.setOwnerId(event.getOwnerId());
-        eventKafka.setChangedById(userId);
-        eventKafka.setSubscribersLogins(subsList);
-
-        Optional.ofNullable(eventUpdateRequest.name()).filter(e -> !e.equals(event.getName()))
-                .ifPresent(e -> eventKafka.setName(new FieldChange<>(event.getName(), e)));
-
-        Optional.ofNullable(eventUpdateRequest.maxPlace()).filter(e -> !e.equals(event.getMaxPlace()))
-                .ifPresent(e -> eventKafka.setMaxPlaces(new FieldChange<>(event.getMaxPlace(), e)));
-
-        Optional.ofNullable(eventUpdateRequest.date()).filter(e -> !e.equals(event.getDate()))
-                .ifPresent(e -> eventKafka.setDate(new FieldChange<>(event.getDate(), e)));
-
-        Optional.ofNullable(eventUpdateRequest.cost()).filter(e -> !e.equals(event.getCost()))
-                .ifPresent(e -> eventKafka.setCost(new FieldChange<>(event.getCost(), e)));
-
-        Optional.ofNullable(eventUpdateRequest.duration()).filter(e -> !e.equals(event.getDuration()))
-                .ifPresent(e -> eventKafka.setDuration(new FieldChange<>(event.getDuration(), e)));
-
-        Optional.ofNullable(eventUpdateRequest.locationId()).filter(e -> e.equals(event.getLocationId()))
-                .ifPresent(e -> eventKafka.setLocationId(new FieldChange<>(event.getLocationId(), e)));
-
-
-        kafkaProducer.sendMessage(eventKafka);
+        kafkaProducer.sendMessage(notification);
     }
 }

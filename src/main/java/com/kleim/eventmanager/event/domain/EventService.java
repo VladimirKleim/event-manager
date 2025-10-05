@@ -132,7 +132,10 @@ public class EventService {
             throw new IllegalArgumentException("There are no places yet");
         }
 
-        notificationService.ChangeAllEventsFields(updateRequest, eventEntityConverter.toEntity(event), eventRegisterRepository.findAllUserLoginByEventRegisterIdQuery(eventId));
+        notificationService.changeAllFieldsWhenUpdate(
+                updateRequest,
+                eventEntityConverter.toEntity(event),
+                eventRegisterRepository.findAllUserLoginsByEvent(eventId));
 
         var updatedEvent = eventUpdateMapper.updateEventFields(event, updateRequest);
         var updatedEntity = eventEntityConverter.toEntity(updatedEvent);

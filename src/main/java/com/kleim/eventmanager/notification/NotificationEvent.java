@@ -5,7 +5,7 @@ import com.kleim.eventmanager.event.domain.EventStatus;
 import java.time.LocalDateTime;
 import java.util.List;
 
-public class EventChangeKafkaMessage {
+public class NotificationEvent {
 
     private Long eventId;
     private Long ownerId;
@@ -20,7 +20,7 @@ public class EventChangeKafkaMessage {
     private FieldChange<EventStatus> status;
 
 
-    public EventChangeKafkaMessage() {
+    public NotificationEvent() {
     }
 
     public List<String> getSubscribersLogins() {

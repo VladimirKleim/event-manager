@@ -1,6 +1,6 @@
 package com.kleim.eventmanager.kafka;
 
-import com.kleim.eventmanager.notification.EventChangeKafkaMessage;
+import com.kleim.eventmanager.notification.NotificationEvent;
 import org.springframework.boot.autoconfigure.kafka.KafkaProperties;
 import org.springframework.boot.ssl.DefaultSslBundleRegistry;
 import org.springframework.context.annotation.Bean;
@@ -13,13 +13,13 @@ import org.springframework.kafka.core.ProducerFactory;
 @Configuration
 public class KafkaConfiguration {
     @Bean
-    public KafkaTemplate<Long, EventChangeKafkaMessage> template(
+    public KafkaTemplate<Long, NotificationEvent> template(
             KafkaProperties kafkaProperties
     ) {
         var pros = kafkaProperties.buildProducerProperties(
                 new DefaultSslBundleRegistry()
         );
-        ProducerFactory<Long, EventChangeKafkaMessage> producerFactory =
+        ProducerFactory<Long, NotificationEvent> producerFactory =
                 new DefaultKafkaProducerFactory<>(pros);
 
         return new KafkaTemplate<>(producerFactory);
