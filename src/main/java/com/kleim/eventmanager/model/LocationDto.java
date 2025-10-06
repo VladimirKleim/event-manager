@@ -3,7 +3,6 @@ package com.kleim.eventmanager.model;
 import jakarta.validation.constraints.*;
 
 public record LocationDto(
-
         @Null
         Long id,
 

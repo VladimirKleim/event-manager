@@ -1,7 +1,5 @@
 package com.kleim.eventmanager.serverdto;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-
 import java.time.LocalDateTime;
 
 

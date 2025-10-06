@@ -5,7 +5,6 @@ import com.kleim.eventmanager.entity.LocationEntity;
 import com.kleim.eventmanager.model.Location;
 import com.kleim.eventmanager.model.LocationEntityConverter;
 import com.kleim.eventmanager.repository.LocationRepository;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -25,8 +24,8 @@ public class LocationService {
 
 
     public Location createLocate(Location location) {
-        if (locationRepository.existsById(location.id())) {
-            throw new NoSuchElementException("Location with id " + location.id() + " not found");
+        if (location.id() != null) {
+            throw new IllegalArgumentException("Can not create location with provided id. Id Must be empty");
         }
 
         var createEntityLocation = locationEntityConverter.toEntity(location);
@@ -35,21 +34,25 @@ public class LocationService {
         return locationEntityConverter.toLocation(createdLocation);
     }
 
+
     public Location getLocationById(Long id) {
         var locationEntity = locationRepository.findById(id).orElseThrow(() ->
                 new IllegalArgumentException("Location already exists"));
         return locationEntityConverter.toLocation(locationEntity);
     }
 
+
     public List<Location> getAllLocations() {
         return locationRepository.findAll().stream().map(locationEntityConverter::toLocation).toList();
     }
+
 
     public Location deleteLocation(Long id) {
         var deleteLocation = locationRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Location with id " + id + " not found"));
         locationRepository.deleteById(id);
       return locationEntityConverter.toLocation(deleteLocation);
     }
+
 
     public Location updateLocation(Long id, Location location) {
         if (location.id() != null) {
