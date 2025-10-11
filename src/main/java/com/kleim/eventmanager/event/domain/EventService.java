@@ -1,9 +1,11 @@
 package com.kleim.eventmanager.event.domain;
 
 import com.kleim.eventmanager.auth.domain.UserRole;
+import com.kleim.eventmanager.event.db.EventRegisterRepository;
 import com.kleim.eventmanager.event.db.EventRepository;
 import com.kleim.eventmanager.location.domain.LocationService;
 import com.kleim.eventmanager.auth.domain.AuthenticationService;
+import com.kleim.eventmanager.notification.NotificationService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,15 +22,20 @@ public class EventService {
     private final EventEntityConverter eventEntityConverter;
     private final EventCreateMapper eventCreateMapper;
     private final EventUpdateMapper eventUpdateMapper;
+    private final NotificationService notificationService;
+
+    private final EventRegisterRepository eventRegisterRepository;
 
 
-    public EventService(EventRepository eventRepository, LocationService locationService, AuthenticationService authenticationService, EventEntityConverter eventEntityConverter, EventCreateMapper eventCreateMapper, EventUpdateMapper eventUpdateMapper) {
+    public EventService(EventRepository eventRepository, LocationService locationService, AuthenticationService authenticationService, EventEntityConverter eventEntityConverter, EventCreateMapper eventCreateMapper, EventUpdateMapper eventUpdateMapper, NotificationService notificationService, EventRegisterRepository eventRegisterRepository) {
         this.eventRepository = eventRepository;
         this.locationService = locationService;
         this.authenticationService = authenticationService;
         this.eventEntityConverter = eventEntityConverter;
         this.eventCreateMapper = eventCreateMapper;
         this.eventUpdateMapper = eventUpdateMapper;
+        this.notificationService = notificationService;
+        this.eventRegisterRepository = eventRegisterRepository;
     }
 
 
@@ -69,6 +76,8 @@ public class EventService {
          }
          //soft delete
          eventRepository.changeEventStatus(eventId, EventStatus.CANCELLED);
+
+         notificationService.changeEventStatus(event.id(), EventStatus.CANCELLED);
      }
     }
 
@@ -122,6 +131,11 @@ public class EventService {
                 event.registrationList().size() > updateRequest.maxPlace()) {
             throw new IllegalArgumentException("There are no places yet");
         }
+
+        notificationService.changeAllFieldsWhenUpdate(
+                updateRequest,
+                eventEntityConverter.toEntity(event),
+                eventRegisterRepository.findAllLoginsByRegistrationList(eventId));
 
         var updatedEvent = eventUpdateMapper.updateEventFields(event, updateRequest);
         var updatedEntity = eventEntityConverter.toEntity(updatedEvent);

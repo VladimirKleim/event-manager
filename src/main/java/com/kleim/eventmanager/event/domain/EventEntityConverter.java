@@ -28,6 +28,8 @@ public class EventEntityConverter {
     }
 
     public EventEntity toEntity(Event updatedEvent) {
+        EventEntity eventEntity = new EventEntity();
+        eventEntity.setId(updatedEvent.id());
         return new EventEntity(
                 updatedEvent.id(),
                 updatedEvent.name(),
@@ -37,7 +39,7 @@ public class EventEntityConverter {
                         new EventRegisterEntity(
                                 it.id(),
                                 it.userId(),
-                                toEntity(updatedEvent)
+                                eventEntity
                         )).toList(),
                 updatedEvent.date(),
                 updatedEvent.cost(),
