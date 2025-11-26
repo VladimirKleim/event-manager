@@ -148,6 +148,7 @@ public class EventService {
     }
 
 
+
     @Transactional(readOnly = true) //DML
     public List<Event> searchFilter(EventSearchRequest searchRequest) {
 

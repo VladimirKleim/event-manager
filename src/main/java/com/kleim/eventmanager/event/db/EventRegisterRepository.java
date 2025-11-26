@@ -9,13 +9,9 @@ import java.util.Optional;
 
 public interface EventRegisterRepository extends JpaRepository<EventRegisterEntity, Long> {
 
-    @Query("""
-          SELECT re FROM EventRegisterEntity re
-          WHERE re.event.id = :eventId AND re.userId = :userId
-          """)
     Optional<EventRegisterEntity> findByEventIdAndUserId(
-          Long userId,
-          Long eventId
+            Long userId,
+            Long eventId
     );
 
     @Query("""
@@ -25,4 +21,11 @@ public interface EventRegisterRepository extends JpaRepository<EventRegisterEnti
     List<EventEntity> findEvents(
             @Param("userId") Long userId
     );
+
+    @Query(value = """
+          select u.login from event_register e
+          join users as u on e.user_id = u.id
+           where e.event_id = :eventId
+          """, nativeQuery = true)
+    List<String> findAllLoginsByRegistrationList(Long eventId);
 }

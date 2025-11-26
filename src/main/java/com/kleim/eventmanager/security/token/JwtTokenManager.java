@@ -6,6 +6,8 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+
+import javax.crypto.SecretKey;
 import java.security.Key;
 import java.util.Date;
 import java.util.HashMap;
@@ -15,7 +17,7 @@ import java.util.Map;
 public class JwtTokenManager {
 
     private final Long tokenLifetime;
-    private final Key signKey;
+    private final SecretKey signKey;
 
 
     public JwtTokenManager(
@@ -47,9 +49,9 @@ public class JwtTokenManager {
     public boolean isTokenValid(String jwtToken) {
         try {
             Jwts.parser()
-                    .setSigningKey(signKey)
+                    .verifyWith(signKey)
                     .build()
-                    .parse(jwtToken);
+                    .parseSignedClaims(jwtToken);
         } catch (Exception e) {
             return false;
         }
@@ -58,9 +60,9 @@ public class JwtTokenManager {
 
     public String getLoginFromToken(String jwtToken) {
            return Jwts.parser()
-                    .setSigningKey(signKey)
+                    .verifyWith(signKey)
                     .build()
-                    .parseClaimsJws(jwtToken)
+                    .parseSignedClaims(jwtToken)
                     .getPayload()
                     .getSubject();
 
@@ -68,10 +70,10 @@ public class JwtTokenManager {
 
     public String getRoleFromToken(String jwtToken) {
         return Jwts.parser()
-                .setSigningKey(signKey)
+                .verifyWith(signKey)
                 .build()
-                .parseClaimsJws(jwtToken)
-                .getBody()
+                .parseSignedClaims(jwtToken)
+                .getPayload()
                 .get("role", String.class);
 
     }

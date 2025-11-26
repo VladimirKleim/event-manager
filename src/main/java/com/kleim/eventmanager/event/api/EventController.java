@@ -26,6 +26,8 @@ public class EventController {
 
     private final EventSearchMapper eventSearchMapper;
 
+
+
     public EventController(EventService eventService, EventConverter eventConverter, EventUpdateMapper eventUpdateMapper, EventCreateMapper eventCreateMapper, EventSearchMapper eventSearchMapper) {
         this.eventService = eventService;
         this.eventConverter = eventConverter;
@@ -41,7 +43,10 @@ public class EventController {
     ) {
       log.info("Got request to create and save event with name:{}", eventDto.name());
       var savedEvent = eventService.eventCreate(eventCreateMapper.toDomain(eventDto));
-      return ResponseEntity.status(HttpStatus.CREATED).body(eventConverter.toDto(savedEvent));
+      return ResponseEntity
+              .status(HttpStatus.CREATED)
+              .body(eventConverter.toDto(savedEvent)
+              );
     }
 
 

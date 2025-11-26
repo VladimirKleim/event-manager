@@ -12,7 +12,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 @EnableScheduling
 @Configuration
-@Component
 public class EventSchedulerUpdater {
 
     private final Logger log = LoggerFactory.getLogger(EventSchedulerUpdater.class);
