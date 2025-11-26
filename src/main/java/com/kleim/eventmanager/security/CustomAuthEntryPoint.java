@@ -1,7 +1,7 @@
 package com.kleim.eventmanager.security;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.kleim.eventmanager.serverdto.ServerErrorDTO;
+import com.kleim.eventmanager.middleware.ServerErrorDTO;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;

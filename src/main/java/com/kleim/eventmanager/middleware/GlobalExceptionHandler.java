@@ -1,4 +1,4 @@
-package com.kleim.eventmanager.serverdto;
+package com.kleim.eventmanager.middleware;
 
 
 import jakarta.persistence.EntityNotFoundException;

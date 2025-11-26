@@ -3,10 +3,11 @@ package com.kleim.eventmanager.event.domain;
 import com.kleim.eventmanager.auth.domain.UserRole;
 import com.kleim.eventmanager.event.NotificationService;
 import com.kleim.eventmanager.event.db.EventRepository;
-import com.kleim.eventmanager.location.db.LocationRepository;
 import com.kleim.eventmanager.location.domain.LocationService;
 import com.kleim.eventmanager.auth.domain.AuthenticationService;
-import com.kleim.eventmanager.auth.domain.UserService;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,30 +20,28 @@ public class EventService {
 
     private final EventRepository eventRepository;
     private final LocationService locationService;
-    private final UserService userService;
     private final AuthenticationService authenticationService;
     private final EventEntityConverter eventEntityConverter;
-    private final LocationRepository locationRepository;
     private final NotificationService notificationService;
-
     private final EventCreateMapper eventCreateMapper;
-
     private final EventUpdateMapper eventUpdateMapper;
 
+    private final EventService self;
 
-    public EventService(EventRepository eventRepository, LocationService locationService, UserService userService, AuthenticationService authenticationService, EventEntityConverter eventEntityConverter, LocationRepository locationRepository, NotificationService notificationService, EventCreateMapper eventCreateMapper, EventUpdateMapper eventUpdateMapper) {
+
+    public EventService(EventRepository eventRepository, LocationService locationService, AuthenticationService authenticationService, EventEntityConverter eventEntityConverter, NotificationService notificationService, EventCreateMapper eventCreateMapper, EventUpdateMapper eventUpdateMapper, @Lazy EventService self) {
         this.eventRepository = eventRepository;
         this.locationService = locationService;
-        this.userService = userService;
         this.authenticationService = authenticationService;
         this.eventEntityConverter = eventEntityConverter;
-        this.locationRepository = locationRepository;
         this.notificationService = notificationService;
         this.eventCreateMapper = eventCreateMapper;
         this.eventUpdateMapper = eventUpdateMapper;
+        this.self = self;
     }
 
 
+    @CacheEvict(value = "events",allEntries = true)
     public Event eventCreate(EventCreateRequest eventCreateRequest) {
 
        var user = authenticationService.getCurrentAuthUser();
@@ -60,6 +59,7 @@ public class EventService {
     }
 
 
+    @Cacheable(value = "events", key = "#eventId")
     public Event getEventById(Long eventId) {
         var gotEvent = eventRepository.findById(eventId).orElseThrow(() ->
                 new IllegalArgumentException("Event does not exist"));
@@ -68,9 +68,10 @@ public class EventService {
 
 
     @Transactional
+    @CacheEvict(value = "events", key = "#eventId")
     public void cancelEventById(Long eventId) {
      checkAccessToModifyEvent(eventId);
-     var event = getEventById(eventId);
+     var event = self.getEventById(eventId);
      if (event.id() != null) {
          if (event.status().equals(EventStatus.CANCELLED)) {
             throw new IllegalArgumentException("Event is already over.");
@@ -106,6 +107,7 @@ public class EventService {
 
 
     @Transactional
+    @CacheEvict(value = "events", allEntries = true)
     public Event updateEvent(Long eventId, EventUpdateRequest updateRequest) {
         checkAccessToModifyEvent(eventId);
         var event = getEventById(eventId);
