@@ -19,20 +19,18 @@ public class EventCreateMapper {
         );
     }
 
-    public EventEntity toEntity(EventCreateRequest eventCreateRequest, Long ownerId) {
+    public EventEntity toEntity(Long userId, EventCreateRequest eventCreateRequest) {
         return new EventEntity(
-           null,
-           eventCreateRequest.name(),
-           ownerId,
-           eventCreateRequest.maxPlace(),
-           List.of(),
-           eventCreateRequest.date(),
-           eventCreateRequest.cost(),
-           eventCreateRequest.duration(),
-           eventCreateRequest.locationId(),
-           EventStatus.WAIT_START
+                null,
+                eventCreateRequest.name(),
+                userId,
+                eventCreateRequest.maxPlace(),
+                List.of(),
+                eventCreateRequest.date(),
+                eventCreateRequest.cost(),
+                eventCreateRequest.duration(),
+                eventCreateRequest.locationId(),
+                EventStatus.WAIT_START
         );
     }
-
-
 }

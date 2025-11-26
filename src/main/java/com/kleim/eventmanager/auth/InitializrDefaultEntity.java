@@ -12,6 +12,8 @@ import org.springframework.stereotype.Component;
 @Component
 public class InitializrDefaultEntity {
 
+
+
     private final UserService userService;
     private final PasswordEncoder passwordEncoder;
 

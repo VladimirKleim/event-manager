@@ -27,25 +27,24 @@ public class EventEntityConverter {
         );
     }
 
-    public EventEntity toEntity(Event updatedEvent) {
-        EventEntity eventEntity = new EventEntity();
-        eventEntity.setId(updatedEvent.id());
+
+    public EventEntity toEntity(Event event) {
         return new EventEntity(
-                updatedEvent.id(),
-                updatedEvent.name(),
-                updatedEvent.ownerId(),
-                updatedEvent.maxPlace(),
-                updatedEvent.registrationList().stream().map(it ->
+                event.id(),
+                event.name(),
+                event.ownerId(),
+                event.maxPlace(),
+                event.registrationList().stream().map(it ->
                         new EventRegisterEntity(
                                 it.id(),
                                 it.userId(),
-                                eventEntity
-                        )).toList(),
-                updatedEvent.date(),
-                updatedEvent.cost(),
-                updatedEvent.duration(),
-                updatedEvent.locationId(),
-                updatedEvent.status()
+                                toEntity(event))
+                ).toList(),
+                event.date(),
+                event.cost(),
+                event.duration(),
+                event.locationId(),
+                event.status()
         );
     }
 }

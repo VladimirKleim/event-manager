@@ -1,11 +1,13 @@
 package com.kleim.eventmanager.event.domain;
 
 import com.kleim.eventmanager.auth.domain.UserRole;
-import com.kleim.eventmanager.event.db.EventRegisterRepository;
+import com.kleim.eventmanager.event.NotificationService;
 import com.kleim.eventmanager.event.db.EventRepository;
 import com.kleim.eventmanager.location.domain.LocationService;
 import com.kleim.eventmanager.auth.domain.AuthenticationService;
-import com.kleim.eventmanager.notification.NotificationService;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,25 +22,26 @@ public class EventService {
     private final LocationService locationService;
     private final AuthenticationService authenticationService;
     private final EventEntityConverter eventEntityConverter;
+    private final NotificationService notificationService;
     private final EventCreateMapper eventCreateMapper;
     private final EventUpdateMapper eventUpdateMapper;
-    private final NotificationService notificationService;
 
-    private final EventRegisterRepository eventRegisterRepository;
+    private final EventService self;
 
 
-    public EventService(EventRepository eventRepository, LocationService locationService, AuthenticationService authenticationService, EventEntityConverter eventEntityConverter, EventCreateMapper eventCreateMapper, EventUpdateMapper eventUpdateMapper, NotificationService notificationService, EventRegisterRepository eventRegisterRepository) {
+    public EventService(EventRepository eventRepository, LocationService locationService, AuthenticationService authenticationService, EventEntityConverter eventEntityConverter, NotificationService notificationService, EventCreateMapper eventCreateMapper, EventUpdateMapper eventUpdateMapper, @Lazy EventService self) {
         this.eventRepository = eventRepository;
         this.locationService = locationService;
         this.authenticationService = authenticationService;
         this.eventEntityConverter = eventEntityConverter;
+        this.notificationService = notificationService;
         this.eventCreateMapper = eventCreateMapper;
         this.eventUpdateMapper = eventUpdateMapper;
-        this.notificationService = notificationService;
-        this.eventRegisterRepository = eventRegisterRepository;
+        this.self = self;
     }
 
 
+    @CacheEvict(value = "events",allEntries = true)
     public Event eventCreate(EventCreateRequest eventCreateRequest) {
 
        var user = authenticationService.getCurrentAuthUser();
@@ -49,13 +52,14 @@ public class EventService {
                    .formatted(location.capacity(), eventCreateRequest.maxPlace()));
        }
 
-       var eventEntity = eventCreateMapper.toEntity(eventCreateRequest, user.id());
+       var eventEntity = eventCreateMapper.toEntity(user.id(), eventCreateRequest);
        var savedEntity = eventRepository.save(eventEntity);
 
        return eventEntityConverter.toDomain(savedEntity);
     }
 
 
+    @Cacheable(value = "events", key = "#eventId")
     public Event getEventById(Long eventId) {
         var gotEvent = eventRepository.findById(eventId).orElseThrow(() ->
                 new IllegalArgumentException("Event does not exist"));
@@ -64,9 +68,10 @@ public class EventService {
 
 
     @Transactional
+    @CacheEvict(value = "events", key = "#eventId")
     public void cancelEventById(Long eventId) {
      checkAccessToModifyEvent(eventId);
-     var event = getEventById(eventId);
+     var event = self.getEventById(eventId);
      if (event.id() != null) {
          if (event.status().equals(EventStatus.CANCELLED)) {
             throw new IllegalArgumentException("Event is already over.");
@@ -102,6 +107,7 @@ public class EventService {
 
 
     @Transactional
+    @CacheEvict(value = "events", allEntries = true)
     public Event updateEvent(Long eventId, EventUpdateRequest updateRequest) {
         checkAccessToModifyEvent(eventId);
         var event = getEventById(eventId);
@@ -132,10 +138,7 @@ public class EventService {
             throw new IllegalArgumentException("There are no places yet");
         }
 
-        notificationService.changeAllFieldsWhenUpdate(
-                updateRequest,
-                eventEntityConverter.toEntity(event),
-                eventRegisterRepository.findAllLoginsByRegistrationList(eventId));
+        notificationService.ChangeAllEventsFields(updateRequest, eventEntityConverter.toEntity(event));
 
         var updatedEvent = eventUpdateMapper.updateEventFields(event, updateRequest);
         var updatedEntity = eventEntityConverter.toEntity(updatedEvent);
