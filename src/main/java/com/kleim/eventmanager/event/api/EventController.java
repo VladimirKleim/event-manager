@@ -11,26 +11,19 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/events")
-public class EventController {
+@RequestMapping("api/events")
+public class EventController extends EventApi {
 
     private final Logger log = LoggerFactory.getLogger(EventController.class);
-
     private final EventService eventService;
-
-    private final EventConverter eventConverter;
-
+    private final EventMapper eventMapper;
     private final EventUpdateMapper eventUpdateMapper;
-
     private final EventCreateMapper eventCreateMapper;
-
     private final EventSearchMapper eventSearchMapper;
 
-
-
-    public EventController(EventService eventService, EventConverter eventConverter, EventUpdateMapper eventUpdateMapper, EventCreateMapper eventCreateMapper, EventSearchMapper eventSearchMapper) {
+    public EventController(EventService eventService, EventMapper eventMapper, EventUpdateMapper eventUpdateMapper, EventCreateMapper eventCreateMapper, EventSearchMapper eventSearchMapper) {
         this.eventService = eventService;
-        this.eventConverter = eventConverter;
+        this.eventMapper = eventMapper;
         this.eventUpdateMapper = eventUpdateMapper;
         this.eventCreateMapper = eventCreateMapper;
         this.eventSearchMapper = eventSearchMapper;
@@ -43,12 +36,8 @@ public class EventController {
     ) {
       log.info("Got request to create and save event with name:{}", eventDto.name());
       var savedEvent = eventService.eventCreate(eventCreateMapper.toDomain(eventDto));
-      return ResponseEntity
-              .status(HttpStatus.CREATED)
-              .body(eventConverter.toDto(savedEvent)
-              );
+      return ResponseEntity.status(HttpStatus.CREATED).body(eventMapper.toDto(savedEvent));
     }
-
 
     @GetMapping("/{eventId}")
     public ResponseEntity<EventDto> getEventById(
@@ -57,7 +46,7 @@ public class EventController {
         log.info("Got request get event with id:{}", eventId);
         var gotEvent = eventService.getEventById(eventId);
 
-        return ResponseEntity.status(HttpStatus.OK).body(eventConverter.toDto(gotEvent));
+        return ResponseEntity.status(HttpStatus.OK).body(eventMapper.toDto(gotEvent));
     }
 
 
@@ -67,7 +56,7 @@ public class EventController {
         var gotEvents = eventService.getAllEvents();
         return ResponseEntity.ok()
                 .body(gotEvents.stream()
-                        .map(eventConverter::toDto)
+                        .map(eventMapper::toDto)
                         .toList());
     }
 
@@ -89,7 +78,7 @@ public class EventController {
     ) {
         log.info("Got request to update");
         var updatedEvent = eventService.updateEvent(eventId, eventUpdateMapper.toDomain(updateRequestDto));
-        return ResponseEntity.ok().body(eventConverter.toDto(updatedEvent));
+        return ResponseEntity.ok().body(eventMapper.toDto(updatedEvent));
     }
 
 
@@ -101,7 +90,7 @@ public class EventController {
         var searchEvents = eventService.searchFilter(eventSearchMapper.toDomain(searchRequestDto));
         return ResponseEntity.ok().body(
                 searchEvents.stream()
-                .map(eventConverter::toDto)
+                .map(eventMapper::toDto)
                 .toList()
         );
     }
@@ -111,7 +100,7 @@ public class EventController {
     public ResponseEntity<List<EventDto>> getOwnerEvent() {
         log.info("Got request to get their events");
         var gotEvent = eventService.getOwner();
-        return ResponseEntity.ok().body(gotEvent.stream().map(eventConverter::toDto).toList());
+        return ResponseEntity.ok().body(gotEvent.stream().map(eventMapper::toDto).toList());
     }
 
 }

@@ -1,6 +1,6 @@
 services:
   postgres:
-    image: postgres:latest
+    image: postgres:15.15-trixie
     container_name: event-manager-db
     environment:
       POSTGRES_USER: project
@@ -11,14 +11,14 @@ services:
 
 
   zookeeper:
-    image: confluentinc/cp-zookeeper:7.5.0
+    image: confluentinc/cp-zookeeper:7.7.7
     environment:
       ZOOKEEPER_CLIENT_PORT: 2181
     ports:
       - "2181:2181"
 
   kafka:
-    image: confluentinc/cp-kafka:7.5.0
+    image: confluentinc/cp-kafka:7.7.7
     depends_on:
       - zookeeper
     environment:
@@ -30,7 +30,7 @@ services:
       - "9092:9092"
 
   redis:
-    image: redis:7.2-alpine
+    image: redis:latest
     container_name: redis_container
     restart: unless-stopped
     ports:
