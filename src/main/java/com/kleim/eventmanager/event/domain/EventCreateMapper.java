@@ -1,36 +1,30 @@
 package com.kleim.eventmanager.event.domain;
 
 import com.kleim.eventmanager.event.db.EventEntity;
-import org.springframework.stereotype.Component;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.ReportingPolicy;
 
-import java.util.List;
+import java.util.ArrayList;
 
-@Component
-public class EventCreateMapper {
 
-    public EventCreateRequest toDomain(EventCreateRequestDto eventCreateRequest) {
-        return new EventCreateRequest(
-                eventCreateRequest.name(),
-                eventCreateRequest.maxPlace(),
-                eventCreateRequest.date(),
-                eventCreateRequest.cost(),
-                eventCreateRequest.duration(),
-                eventCreateRequest.locationId()
-        );
-    }
+@Mapper(
+        componentModel = "spring",
+        unmappedTargetPolicy = ReportingPolicy.WARN,
+        imports = {ArrayList.class, EventStatus.class}
+)
+public interface EventCreateMapper {
 
-    public EventEntity toEntity(Long userId, EventCreateRequest eventCreateRequest) {
-        return new EventEntity(
-                null,
-                eventCreateRequest.name(),
-                userId,
-                eventCreateRequest.maxPlace(),
-                List.of(),
-                eventCreateRequest.date(),
-                eventCreateRequest.cost(),
-                eventCreateRequest.duration(),
-                eventCreateRequest.locationId(),
-                EventStatus.WAIT_START
-        );
+    EventCreateRequest toDomain(EventCreateRequestDto eventCreateRequest);
+
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "ownerId", source = "userId")
+    @Mapping(target = "registrationList", expression = "java(createEmptyList())")
+    @Mapping(target = "status", expression = "java(EventStatus.WAIT_START)")
+    EventEntity toEntity(Long userId, EventCreateRequest eventCreateRequest);
+
+    //@Named("emptyRegistrationList")
+    default <T> ArrayList<T> createEmptyList() {
+        return new ArrayList<>();
     }
 }

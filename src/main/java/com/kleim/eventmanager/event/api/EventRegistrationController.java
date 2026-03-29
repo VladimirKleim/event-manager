@@ -1,7 +1,7 @@
 package com.kleim.eventmanager.event.api;
 
 import com.kleim.eventmanager.auth.domain.AuthenticationService;
-import com.kleim.eventmanager.event.domain.EventConverter;
+import com.kleim.eventmanager.event.domain.EventMapper;
 import com.kleim.eventmanager.event.domain.EventDto;
 import com.kleim.eventmanager.event.domain.EventRegistrationService;
 import org.slf4j.Logger;
@@ -19,13 +19,13 @@ public class EventRegistrationController {
     private final Logger log = LoggerFactory.getLogger(EventRegistrationController.class);
     private final EventRegistrationService registrationService;
     private final AuthenticationService authenticationService;
-    private final EventConverter eventConverter;
+    private final EventMapper eventMapper;
 
 
-    public EventRegistrationController(EventRegistrationService registrationService, AuthenticationService authenticationService, EventConverter eventConverter) {
+    public EventRegistrationController(EventRegistrationService registrationService, AuthenticationService authenticationService, EventMapper eventMapper) {
         this.registrationService = registrationService;
         this.authenticationService = authenticationService;
-        this.eventConverter = eventConverter;
+        this.eventMapper = eventMapper;
     }
 
     @PostMapping("/{eventId}")
@@ -56,7 +56,7 @@ public class EventRegistrationController {
         var findAll = registrationService.findRegEvents(authenticationService.getCurrentAuthUser().id());
         return ResponseEntity.ok().body(
                 findAll.stream()
-                        .map(eventConverter::toDto)
+                        .map(eventMapper::toDto)
                         .toList()
         );
     }

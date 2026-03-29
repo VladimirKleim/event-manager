@@ -41,7 +41,7 @@ public class EventService {
     }
 
 
-    @CacheEvict(value = "events",allEntries = true)
+    @CacheEvict(value = "events", allEntries = true)
     public Event eventCreate(EventCreateRequest eventCreateRequest) {
 
        var user = authenticationService.getCurrentAuthUser();
