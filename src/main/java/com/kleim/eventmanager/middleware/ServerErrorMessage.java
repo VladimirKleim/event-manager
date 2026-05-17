@@ -2,8 +2,7 @@ package com.kleim.eventmanager.middleware;
 
 import java.time.LocalDateTime;
 
-
-public record ServerErrorDTO(
+public record ServerErrorMessage(
 
         String message,
         String detailMessage,

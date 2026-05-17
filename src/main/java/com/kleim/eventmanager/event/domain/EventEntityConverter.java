@@ -27,7 +27,6 @@ public class EventEntityConverter {
         );
     }
 
-
     public EventEntity toEntity(Event event) {
         return new EventEntity(
                 event.id(),

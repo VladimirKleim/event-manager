@@ -9,7 +9,6 @@ services:
     ports:
       - "5431:5432"
 
-
   zookeeper:
     image: confluentinc/cp-zookeeper:7.7.7
     environment:

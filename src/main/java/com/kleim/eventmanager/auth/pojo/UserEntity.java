@@ -14,6 +14,8 @@ public final class UserEntity {
     private String login;
     @Column(name = "password", nullable = false)
     private String password;
+    @Column(name = "email", unique = true, nullable = false)
+    private String email;
     @Column(name = "age", nullable = false)
     private Integer age;
     @Column(name = "role", nullable = false)
@@ -21,10 +23,11 @@ public final class UserEntity {
 
     public UserEntity() {}
 
-    public UserEntity(Long id, String login, String password, Integer age, String role) {
+    public UserEntity(Long id, String login, String password, String email, Integer age, String role) {
         this.id = id;
         this.login = login;
         this.password = password;
+        this.email = email;
         this.age = age;
         this.role = role;
     }
@@ -67,5 +70,13 @@ public final class UserEntity {
 
     public void setRole(String role) {
         this.role = role;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
     }
 }

@@ -1,7 +1,7 @@
 package com.kleim.eventmanager.auth.domain;
 
+import com.kleim.eventmanager.auth.pojo.AuthenticatedUser;
 import com.kleim.eventmanager.auth.pojo.SignInRequest;
-import com.kleim.eventmanager.auth.pojo.User;
 import com.kleim.eventmanager.security.token.JwtTokenManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -23,23 +23,20 @@ public class AuthenticationService {
     }
 
     public String authUser(SignInRequest signInRequest) {
-        if (!userService.isUserExistsByLogin(signInRequest.login())) {
-            throw new BadCredentialsException("Bad credentials");
-        }
-        var user = userService.getUserByLogin(signInRequest.login());
+       var user = userService.getUserByLogin(signInRequest.login());
+
        if (!passwordEncoder.matches(signInRequest.password(), user.password())) {
-           throw new BadCredentialsException("Not valid login");
+           throw new BadCredentialsException("Not valid login or password");
         }
+
        return jwtTokenManager.generateToken(user);
     }
 
-    public User getCurrentAuthUser() {
-        var currentUser = SecurityContextHolder.getContext().getAuthentication();
-        if (currentUser == null) {
-
-            throw new UsernameNotFoundException("Auth no present");
+    public AuthenticatedUser getCurrentAuthUser() {
+        var auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth == null || !(auth.getPrincipal() instanceof AuthenticatedUser authenticatedUser)) {
+            throw new UsernameNotFoundException("Auth not present");
         }
-        return (User) currentUser.getPrincipal();
-
+        return authenticatedUser;
     }
 }

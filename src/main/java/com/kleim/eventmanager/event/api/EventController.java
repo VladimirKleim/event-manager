@@ -1,6 +1,8 @@
 package com.kleim.eventmanager.event.api;
 
 import com.kleim.eventmanager.event.domain.*;
+import com.kleim.eventmanager.mapper.EventDbMapper;
+import com.kleim.eventmanager.mapper.EventMapper;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,30 +14,29 @@ import java.util.List;
 
 @RestController
 @RequestMapping("api/events")
-public class EventController extends EventApi {
+public class EventController implements EventApi {
 
     private final Logger log = LoggerFactory.getLogger(EventController.class);
     private final EventService eventService;
     private final EventMapper eventMapper;
     private final EventUpdateMapper eventUpdateMapper;
-    private final EventCreateMapper eventCreateMapper;
+    private final EventDbMapper eventDbMapper;
     private final EventSearchMapper eventSearchMapper;
 
-    public EventController(EventService eventService, EventMapper eventMapper, EventUpdateMapper eventUpdateMapper, EventCreateMapper eventCreateMapper, EventSearchMapper eventSearchMapper) {
+    public EventController(EventService eventService, EventMapper eventMapper, EventUpdateMapper eventUpdateMapper, EventDbMapper eventDbMapper, EventSearchMapper eventSearchMapper) {
         this.eventService = eventService;
         this.eventMapper = eventMapper;
         this.eventUpdateMapper = eventUpdateMapper;
-        this.eventCreateMapper = eventCreateMapper;
+        this.eventDbMapper = eventDbMapper;
         this.eventSearchMapper = eventSearchMapper;
     }
-
 
     @PostMapping
     public ResponseEntity<EventDto> createEvent(
             @RequestBody @Valid EventCreateRequestDto eventDto
     ) {
       log.info("Got request to create and save event with name:{}", eventDto.name());
-      var savedEvent = eventService.eventCreate(eventCreateMapper.toDomain(eventDto));
+      var savedEvent = eventService.eventCreate(eventDbMapper.toDomain(eventDto));
       return ResponseEntity.status(HttpStatus.CREATED).body(eventMapper.toDto(savedEvent));
     }
 
@@ -49,7 +50,6 @@ public class EventController extends EventApi {
         return ResponseEntity.status(HttpStatus.OK).body(eventMapper.toDto(gotEvent));
     }
 
-
     @GetMapping
     public ResponseEntity<List<EventDto>> getAllEvents() {
         log.info("Got request to get all events");
@@ -60,7 +60,6 @@ public class EventController extends EventApi {
                         .toList());
     }
 
-
     @DeleteMapping("/{eventId}")
     public ResponseEntity<Void> eventSoftDelete(
             @PathVariable("eventId") Long eventId
@@ -69,7 +68,6 @@ public class EventController extends EventApi {
         eventService.cancelEventById(eventId);
        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
-
 
     @PutMapping("/{eventId}")
     public ResponseEntity<EventDto> updateEvent(
@@ -80,7 +78,6 @@ public class EventController extends EventApi {
         var updatedEvent = eventService.updateEvent(eventId, eventUpdateMapper.toDomain(updateRequestDto));
         return ResponseEntity.ok().body(eventMapper.toDto(updatedEvent));
     }
-
 
     @PostMapping("/search")
     public ResponseEntity<List<EventDto>> eventSearchFilter(
@@ -94,7 +91,6 @@ public class EventController extends EventApi {
                 .toList()
         );
     }
-
 
     @GetMapping("/my")
     public ResponseEntity<List<EventDto>> getOwnerEvent() {

@@ -1,6 +1,5 @@
 package com.kleim.eventmanager.event.domain;
 
-import org.hibernate.annotations.Comment;
 import org.springframework.stereotype.Component;
 
 @Component

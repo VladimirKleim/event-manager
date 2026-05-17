@@ -16,3 +16,33 @@ DO $$
                 RAISE NOTICE 'Вставлено % записей', (i + 1) * 10000;
             END LOOP;
     END $$;
+
+
+DO $$
+DECLARE
+batch_size integer := 100000;
+    total_rows integer := 10000000;
+    start_num integer := 1;
+    end_num integer;
+BEGIN
+    WHILE start_num <= total_rows LOOP
+        end_num := LEAST(start_num + batch_size - 1, total_rows);
+
+INSERT INTO locations (name, address, capacity, description)
+SELECT
+    'Location ' || gs,
+    'Address ' || gs,
+    50 + (random() * 450)::int,
+    'Description for location ' || gs
+FROM generate_series(start_num, end_num) AS gs;
+
+RAISE NOTICE 'Inserted rows: % - %', start_num, end_num;
+
+        start_num := end_num + 1;
+END LOOP;
+END $$;
+
+SET key-1 value-1
+
+
+select lo

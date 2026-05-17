@@ -1,0 +1,75 @@
+Redis
+//    private ObjectMapper objectMapper() {
+//        ObjectMapper mapper = new ObjectMapper();
+//        mapper.registerModule(new JavaTimeModule());
+//        mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+//        mapper.activateDefaultTyping(
+//                mapper.getPolymorphicTypeValidator(),
+//                ObjectMapper.DefaultTyping.EVERYTHING
+//        );
+//
+//        return mapper;
+//    }
+//
+//    @Bean
+//    public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory connectionFactory) {
+//        RedisTemplate<String, Object> template = new RedisTemplate<>();
+//        template.setConnectionFactory(connectionFactory);
+//        template.setKeySerializer(new StringRedisSerializer());
+//        template.setValueSerializer(new GenericJackson2JsonRedisSerializer(objectMapper()));
+//        return template;
+//    }
+//
+//    @Bean
+//    public CacheManager cacheManager(RedisConnectionFactory connectionFactory) {
+//        GenericJackson2JsonRedisSerializer serializer =
+//                new GenericJackson2JsonRedisSerializer(objectMapper());
+//
+//        RedisCacheConfiguration config = RedisCacheConfiguration.defaultCacheConfig()
+//                .entryTtl(Duration.ofMinutes(10))
+//                .serializeKeysWith(RedisSerializationContext.SerializationPair.fromSerializer(new StringRedisSerializer()))
+//                .serializeValuesWith(RedisSerializationContext.SerializationPair.fromSerializer(serializer));
+//
+//        return RedisCacheManager.builder(connectionFactory)
+//                .cacheDefaults(config)
+//                .build();
+//    }
+}
+
+//    @DeleteMapping("/{id}")
+//    public ResponseEntity<Void> deleteLocation(
+//            @PathVariable("id") Long id,
+//            @RequestParam(value = "cacheMode", defaultValue = "NONE_CACHE") CacheMode cacheMode
+//    ) {
+//        log.info("Got deleted location by id: %s".formatted(id));
+//        var locationService = resoleLocationService(cacheMode);
+//        locationService.deleteLocation(id);
+//        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+//    }
+
+//    @PostMapping
+//    public ResponseEntity<LocationDto> createLocation(
+//            @RequestBody @Valid LocationDto location
+//    ) {
+//        log.info("Got created location");
+//        var createdLocate = locationServiceImpl.createLocate(locationConverter.toDomain(location));
+//        return ResponseEntity.status(HttpStatus.CREATED).body(locationConverter.toDtoLocation(createdLocate));
+//    }
+
+//    @GetMapping("/{id}")
+//    public ResponseEntity<LocationDto> getLocationById(
+//            @PathVariable("id") Long id,
+//            @RequestParam(value = "cacheMode", defaultValue = "NONE_CACHE") CacheMode cacheMode
+//    ) throws JsonProcessingException {
+//        log.info("Got location by id: %s".formatted(id));
+//        LocationService locationService = resoleLocationService(cacheMode);
+//        var loc = locationService.getLocationById(id);
+//        return ResponseEntity.status(HttpStatus.ACCEPTED).body(locationConverter.toDtoLocation(loc));
+//    }
+
+
+        <!-- Запрет import * -->
+<!--        <module name="AvoidStarImport"/>-->
+
+        <!-- Пустая строка между методами, полями, конструкторами -->
+<!--        <module name="EmptyLineSeparator"/>-->

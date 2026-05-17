@@ -1,7 +1,7 @@
 package com.kleim.eventmanager.event.api;
 
 import com.kleim.eventmanager.auth.domain.AuthenticationService;
-import com.kleim.eventmanager.event.domain.EventMapper;
+import com.kleim.eventmanager.mapper.EventMapper;
 import com.kleim.eventmanager.event.domain.EventDto;
 import com.kleim.eventmanager.event.domain.EventRegistrationService;
 import org.slf4j.Logger;
@@ -13,14 +13,13 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/events/registrations")
+@RequestMapping("api/events/registrations")
 public class EventRegistrationController {
 
     private final Logger log = LoggerFactory.getLogger(EventRegistrationController.class);
     private final EventRegistrationService registrationService;
     private final AuthenticationService authenticationService;
     private final EventMapper eventMapper;
-
 
     public EventRegistrationController(EventRegistrationService registrationService, AuthenticationService authenticationService, EventMapper eventMapper) {
         this.registrationService = registrationService;
@@ -60,14 +59,4 @@ public class EventRegistrationController {
                         .toList()
         );
     }
-
 }
-
-
-
-
-
-
-
-
-

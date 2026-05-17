@@ -1,6 +1,5 @@
 package com.kleim.eventmanager.middleware;
 
-
 import jakarta.persistence.EntityNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,20 +16,20 @@ import java.util.stream.Collectors;
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
-    private final Logger exceptionLogger = LoggerFactory.getLogger(GlobalExceptionHandler.class);
+    private final Logger logger = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<ServerErrorDTO> handleValidationException(
+    public ResponseEntity<ServerErrorMessage> handleValidationException(
             MethodArgumentNotValidException e
     ) {
-        exceptionLogger.info("Not valid result");
+        logger.info("Not valid result");
         String detailMessage = e.getBindingResult()
                 .getFieldErrors()
                 .stream()
                 .map(it -> it.getField() + " " + it.getDefaultMessage())
                 .collect(Collectors.joining(", "));
 
-        var errorDTO = new ServerErrorDTO(
+        var errorDTO = new ServerErrorMessage(
                 "Not valid result",
                 detailMessage,
                 LocalDateTime.now());
@@ -39,11 +38,11 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(EntityNotFoundException.class)
-    public ResponseEntity<ServerErrorDTO> handleEntityNotFoundException(
+    public ResponseEntity<ServerErrorMessage> handleEntityNotFoundException(
             EntityNotFoundException e
     ) {
-        exceptionLogger.info("Not valid result : Entity no found");
-        var errorDTO = new ServerErrorDTO(
+        logger.info("Not valid result : Entity no found");
+        var errorDTO = new ServerErrorMessage(
                 "todo",
                 e.getMessage(),
                 LocalDateTime.now()
@@ -52,22 +51,22 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler({IllegalArgumentException.class, NoSuchElementException.class})
-    public ResponseEntity<ServerErrorDTO> handleIllegalArgumentException(
+    public ResponseEntity<ServerErrorMessage> handleIllegalArgumentException(
             IllegalArgumentException e
     ) {
-        exceptionLogger.error("Not valid result : Bad request");
-        var errorDTO = new ServerErrorDTO("Illegal argument",
+        logger.error("Not valid result : Bad request");
+        var errorDTO = new ServerErrorMessage("Illegal argument",
                 e.getMessage(),
                 LocalDateTime.now());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorDTO);
     }
 
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<ServerErrorDTO> handleGenericException(
+    public ResponseEntity<ServerErrorMessage> handleGenericException(
             Exception e
     ) {
-        exceptionLogger.error("Got exception", e);
-        var errorDTO = new ServerErrorDTO("Ошибка на сервере",
+        logger.error("Got exception", e);
+        var errorDTO = new ServerErrorMessage("Ошибка на сервере",
                 e.getMessage(),
                 LocalDateTime.now());
 
@@ -78,16 +77,11 @@ public class GlobalExceptionHandler {
     public ResponseEntity<Object> handleBadCredential(
             BadCredentialsException e
     ) {
-        exceptionLogger.error("Got bad credential exception", e);
-        var errorDTO = new ServerErrorDTO("bad credential",
+        logger.error("Got bad credential exception", e);
+        var errorDTO = new ServerErrorMessage("bad credential",
                 e.getMessage(),
                 LocalDateTime.now());
 
         return ResponseEntity.status(401).body(errorDTO);
     }
-
 }
-
-
-
-

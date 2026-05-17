@@ -1,6 +1,7 @@
 package com.kleim.eventmanager.security.token;
 
-import com.kleim.eventmanager.auth.domain.UserService;
+import com.kleim.eventmanager.auth.domain.UserRole;
+import com.kleim.eventmanager.auth.pojo.AuthenticatedUser;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -19,11 +20,9 @@ import java.util.List;
 public class JwtTokenFilter extends OncePerRequestFilter {
 
     private final JwtTokenManager jwtTokenManager;
-    private final UserService userService;
 
-    public JwtTokenFilter(JwtTokenManager jwtTokenManager, UserService userService) {
+    public JwtTokenFilter(JwtTokenManager jwtTokenManager) {
         this.jwtTokenManager = jwtTokenManager;
-        this.userService = userService;
     }
 
     @Override
@@ -34,29 +33,38 @@ public class JwtTokenFilter extends OncePerRequestFilter {
     ) throws ServletException, IOException {
 
         var authorization = request.getHeader(HttpHeaders.AUTHORIZATION);
+
         if (authorization == null || !authorization.startsWith("Bearer ")) {
-            filterChain.doFilter(request,response);
+            filterChain.doFilter(request, response);
             return;
         }
+
         var jwtToken = authorization.substring(7);
-        if(!jwtTokenManager.isTokenValid(jwtToken)) {
-            //log.info("")
-            filterChain.doFilter(request,response);
+
+        if (!jwtTokenManager.isTokenValid(jwtToken)) {
+            response.setStatus(401);
+            response.setContentType("application/json");
+            response.getWriter().write("Invalid or expired token");
             return;
         }
+
         var login = jwtTokenManager.getLoginFromToken(jwtToken);
         var role = jwtTokenManager.getRoleFromToken(jwtToken);
-        var id = jwtTokenManager.getTokenById(jwtToken);
+        var userId = jwtTokenManager.getUserIdFromToken(jwtToken);
 
-        var user = userService.getUserByLogin(login);
+        var authenticatedUser = new AuthenticatedUser(
+                userId,
+                login,
+                UserRole.valueOf(role)
+        );
 
-        UsernamePasswordAuthenticationToken token =
-                new UsernamePasswordAuthenticationToken(
-                        user,
-                        null,
-                        List.of(new SimpleGrantedAuthority(role)));
-        SecurityContextHolder.getContext().setAuthentication(token);
+        var authentication = new UsernamePasswordAuthenticationToken(
+                authenticatedUser,
+                null,
+                List.of(new SimpleGrantedAuthority(role))
+        );
+        SecurityContextHolder.getContext().setAuthentication(authentication);
 
-        filterChain.doFilter(request,response);
+        filterChain.doFilter(request, response);
     }
 }

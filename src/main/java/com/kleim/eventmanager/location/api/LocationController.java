@@ -1,10 +1,9 @@
 package com.kleim.eventmanager.location.api;
 
-
-import com.kleim.eventmanager.location.domain.LocationConverter;
-import com.kleim.eventmanager.location.domain.LocationDto;
-import com.kleim.eventmanager.location.domain.LocationService;
-import jakarta.validation.Valid;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.kleim.eventmanager.location.domain.*;
+import com.kleim.eventmanager.mapper.LocationMapper;
+import com.kleim.eventmanager.redis.CacheMode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -12,68 +11,83 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
-
 @RestController
-@RequestMapping("/locations")
-public class LocationController {
+public class LocationController implements LocationApi {
 
     private final Logger log = LoggerFactory.getLogger(LocationController.class);
-    private final LocationService locationService;
-    private final LocationConverter locationConverter;
+    private final LocationMapper locationConverter;
+    private final LocationServiceImpl locationServiceImpl;
+    private final ManualLocationServiceImpl manualLocationServiceImpl;
+    private final RedisSpringLocationServiceImpl redisSpringLocationServiceImpl;
 
-    public LocationController(LocationService locationService, LocationConverter locationConverter) {
-        this.locationService = locationService;
+    public LocationController(LocationServiceImpl locationServiceImpl, LocationMapper locationConverter, ManualLocationServiceImpl manualLocationServiceImpl, RedisSpringLocationServiceImpl redisSpringLocationServiceImpl) {
+        this.locationServiceImpl = locationServiceImpl;
         this.locationConverter = locationConverter;
+        this.manualLocationServiceImpl = manualLocationServiceImpl;
+        this.redisSpringLocationServiceImpl = redisSpringLocationServiceImpl;
     }
 
-    @PostMapping
+    @Override
     public ResponseEntity<LocationDto> createLocation(
-            @RequestBody @Valid LocationDto location
+            LocationDto location
     ) {
         log.info("Got created location");
-        var createdLocate = locationService.createLocate(locationConverter.toDomain(location));
+        var createdLocate = locationServiceImpl.createLocate(locationConverter.toDomain(location));
         return ResponseEntity.status(HttpStatus.CREATED).body(locationConverter.toDtoLocation(createdLocate));
+
     }
 
-
-    @GetMapping("/{id}")
+    @Override
     public ResponseEntity<LocationDto> getLocationById(
-            @PathVariable("id") Long id
-    ) {
+            Long id,
+            CacheMode cacheMode
+    ) throws JsonProcessingException {
         log.info("Got location by id: %s".formatted(id));
-        var loc = locationService.getLocationById(id);
-        return ResponseEntity.status(HttpStatus.ACCEPTED).body(locationConverter.toDtoLocation(loc));
+        LocationService locationService = resoleLocationService(cacheMode);
+        var location = locationService.getLocationById(id);
+
+        return ResponseEntity.status(HttpStatus.ACCEPTED).body(locationConverter.toDtoLocation(location));
     }
 
-
-    @GetMapping
-    public List<LocationDto> getAllLocation(
-
-    ) {
+    @Override
+    public List<LocationDto> getAllLocation() {
         log.info("Got all location");
-        return locationService.getAllLocations().stream().map(locationConverter::toDtoLocation).toList();
+        return locationServiceImpl.getAllLocations()
+                .stream()
+                .map(locationConverter::toDtoLocation)
+                .toList();
     }
 
-
-    @DeleteMapping("/{id}")
+    @Override
     public ResponseEntity<Void> deleteLocation(
-            @PathVariable("id") Long id
+            Long id,
+            CacheMode cacheMode
     ) {
         log.info("Got deleted location by id: %s".formatted(id));
+        var locationService = resoleLocationService(cacheMode);
         locationService.deleteLocation(id);
+
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
-
-    @PutMapping("/{id}")
+    @Override
     public ResponseEntity<LocationDto> updateLocation(
-            @PathVariable("id") Long id,
-            @RequestBody LocationDto locationDto
+            Long id,
+            LocationDto locationDto,
+            CacheMode cacheMode
     ) {
        log.info("Got updated location by id: %s".formatted(id));
+       LocationService locationService = resoleLocationService(cacheMode);
        var updated = locationService.updateLocation(id, locationConverter.toDomain(locationDto));
+
        return ResponseEntity.status(HttpStatus.ACCEPTED).body(locationConverter.toDtoLocation(updated));
     }
 
-
+    private LocationService resoleLocationService(CacheMode cacheMode) {
+        return switch (cacheMode) {
+            case NONE_CACHE -> locationServiceImpl;
+            case MANUAL_CACHE -> manualLocationServiceImpl;
+            case REDIS_CACHE -> redisSpringLocationServiceImpl;
+        };
+    }
 }

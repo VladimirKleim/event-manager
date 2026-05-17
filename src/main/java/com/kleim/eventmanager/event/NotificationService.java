@@ -9,7 +9,6 @@ import com.kleim.eventmanager.kafka.KafkaProducer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Service;
 
 import java.util.NoSuchElementException;
 import java.util.Optional;
@@ -39,7 +38,6 @@ public class NotificationService {
                 new NoSuchElementException("Event with id %s not exist".formatted(eventId)));
 
         var userId = authenticationService.getCurrentAuthUser().id();
-
         var eventKafka = new EventChangeKafkaMessage();
 
         eventKafka.setEventId(event.getId());
@@ -56,9 +54,7 @@ public class NotificationService {
     ) {
       log.info("Get message to update event: {}", event);
 
-
       var userId = authenticationService.getCurrentAuthUser().id();
-
       var eventKafka = new EventChangeKafkaMessage();
 
       eventKafka.setEventId(event.getId());
@@ -83,8 +79,6 @@ public class NotificationService {
           Optional.ofNullable(eventUpdateRequest.locationId()).filter(e -> e.equals(event.getLocationId()))
                   .ifPresent(e -> eventKafka.setLocationId(new FieldChange<>(event.getLocationId(), e)));
 
-
         kafkaProducer.sendMessage(eventKafka);
     }
-
 }

@@ -1,4 +1,9 @@
 package com.kleim.eventmanager.redis;
 
-public class CacheMode {
+public enum CacheMode {
+
+    NONE_CACHE,
+    MANUAL_CACHE,
+    REDIS_CACHE
+
 }

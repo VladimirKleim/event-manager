@@ -7,7 +7,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 @EnableScheduling
@@ -26,13 +25,8 @@ public class EventSchedulerUpdater {
     public void eventStatusUpdater() {
 
         log.info("Scheduler started");
-
         eventRepository.startEventWithStateWaitStart(EventStatus.WAIT_START, EventStatus.STARTED);
 
         eventRepository.startEventWithStateFinished(EventStatus.STARTED, EventStatus.FINISHED);
-
-
-
     }
-
 }

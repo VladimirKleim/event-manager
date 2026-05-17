@@ -7,7 +7,7 @@ public record UserDTO(
         Long id,
         String login,
         Integer age,
+        String email,
         UserRole role
 
-) {
-}
+) {}

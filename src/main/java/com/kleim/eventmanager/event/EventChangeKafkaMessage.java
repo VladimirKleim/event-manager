@@ -2,9 +2,7 @@ package com.kleim.eventmanager.event;
 
 import com.kleim.eventmanager.event.domain.EventStatus;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.List;
 
 public class EventChangeKafkaMessage{
         private Long eventId;
@@ -18,9 +16,7 @@ public class EventChangeKafkaMessage{
         private FieldChange<Long> locationId;
         private FieldChange<EventStatus> status;
 
-
-    public EventChangeKafkaMessage() {
-    }
+    public EventChangeKafkaMessage() {}
 
     public Long getEventId() {
         return eventId;
@@ -29,7 +25,6 @@ public class EventChangeKafkaMessage{
     public void setEventId(Long eventId) {
         this.eventId = eventId;
     }
-
 
     public Long getOwnerId() {
         return ownerId;

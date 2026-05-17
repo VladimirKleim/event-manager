@@ -15,5 +15,4 @@ public record EventSearchRequestDto(
        Integer durationMax,
        Long locationId,
        EventStatus eventStatus
-) {
-}
+) {}

@@ -1,7 +1,7 @@
 package com.kleim.eventmanager.security;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.kleim.eventmanager.middleware.ServerErrorDTO;
+import com.kleim.eventmanager.middleware.ServerErrorMessage;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -31,7 +31,7 @@ public class AccessDeniedHandler implements org.springframework.security.web.acc
             AccessDeniedException accessDeniedException
     ) throws IOException, ServletException {
             logger.info("Handle access denied exception ");
-            var messageResponse = new ServerErrorDTO(
+            var messageResponse = new ServerErrorMessage(
                     "Got error to access",
                     accessDeniedException.getMessage(),
                     LocalDateTime.now()
@@ -41,6 +41,5 @@ public class AccessDeniedHandler implements org.springframework.security.web.acc
             response.setContentType(MediaType.APPLICATION_JSON_VALUE);
             response.setStatus(HttpStatus.FORBIDDEN.value());
             response.getWriter().write(stringResponse);
-
     }
 }

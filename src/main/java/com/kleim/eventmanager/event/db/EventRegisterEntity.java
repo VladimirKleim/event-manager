@@ -17,15 +17,13 @@ public class EventRegisterEntity {
     @JoinColumn(name = "event_id")
     private EventEntity event;
 
-    public EventRegisterEntity () { }
-
+    public EventRegisterEntity () {}
 
     public EventRegisterEntity(Long id, Long userId, EventEntity event) {
         this.id = id;
         this.userId = userId;
         this.event = event;
     }
-
 
     public Long getId() {
         return id;

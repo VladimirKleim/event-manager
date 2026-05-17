@@ -32,5 +32,4 @@ public class EventUpdateMapper {
                 event.status()
         );
     }
-
 }

@@ -1,5 +1,8 @@
-package com.kleim.eventmanager.event.domain;
+package com.kleim.eventmanager.mapper;
 
+import com.kleim.eventmanager.event.domain.Event;
+import com.kleim.eventmanager.event.domain.EventDto;
+import com.kleim.eventmanager.event.domain.EventRegistration;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.ReportingPolicy;

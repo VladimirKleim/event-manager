@@ -35,28 +35,33 @@ public class SecurityConfiguration {
                 .cors(AbstractHttpConfigurer::disable)
                 .sessionManagement(sessionManagement -> sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) //for jwt tokens
                 .authorizeHttpRequests(auth ->
-                           auth.requestMatchers(HttpMethod.POST, "/locations").hasAuthority("ADMIN")
-                                .requestMatchers(HttpMethod.GET, "/locations").hasAnyAuthority("USER", "ADMIN")
-                                .requestMatchers(HttpMethod.GET, "/locations/{id}").hasAnyAuthority("USER", "ADMIN")
-                                .requestMatchers(HttpMethod.DELETE, "/locations/{id}").hasAuthority("ADMIN")
-                                .requestMatchers(HttpMethod.PUT, "/locations/{id}").hasAnyAuthority("ADMIN", "USER")
+                           auth
 
-                                   .requestMatchers(HttpMethod.POST, "/events").hasAnyAuthority("USER", "ADMIN")
-                                   .requestMatchers(HttpMethod.DELETE, "/events/{eventId}").hasAnyAuthority("USER", "ADMIN")
-                                   .requestMatchers(HttpMethod.PUT, "/events/{eventId}").hasAnyAuthority("ADMIN", "USER")
-                                   .requestMatchers(HttpMethod.GET, "/events/**").hasAnyAuthority("USER", "ADMIN")
-                                   .requestMatchers(HttpMethod.POST, "/events/search").hasAuthority("USER")
-                                   .requestMatchers(HttpMethod.GET, "/events/my").hasAnyAuthority("USER", "ADMIN")
-                                   .requestMatchers(HttpMethod.POST, "/events/registrations/").hasAuthority("USER")
-                                   .requestMatchers(HttpMethod.DELETE, "/events/registrations/cancel/").hasAuthority("USER")
-                                   .requestMatchers(HttpMethod.GET, "/events/registrations/my").hasAuthority("USER")
+                                   .requestMatchers(HttpMethod.POST, "/api/users").permitAll()
+                                   .requestMatchers(HttpMethod.POST, "/api/users/auth").permitAll()
+                                   .requestMatchers(HttpMethod.POST, "/api/users/auth/refresh").permitAll()
+                                   // swagger
+                                   .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/openapi.yaml").permitAll()
 
+                                   .requestMatchers(HttpMethod.POST, "/api/location").hasAuthority("ADMIN")
+                                   .requestMatchers(HttpMethod.GET, "/api/location/**").hasAnyAuthority("USER", "ADMIN")
+                                   .requestMatchers(HttpMethod.DELETE, "/api/location/{id}").hasAuthority("ADMIN")
+                                   .requestMatchers(HttpMethod.PUT, "/api/location/{id}").hasAuthority("ADMIN")
 
-                               .requestMatchers(HttpMethod.POST, "/users").permitAll()
-                               .requestMatchers(HttpMethod.POST, "/users/auth").permitAll()
-                               .requestMatchers(HttpMethod.GET, "/users/{id}").hasAuthority("ADMIN")
-                                   .anyRequest().permitAll()
-                                )
+                                   .requestMatchers(HttpMethod.POST, "/api/events").hasAnyAuthority("USER", "ADMIN")
+                                   .requestMatchers(HttpMethod.GET, "/api/events/**").hasAnyAuthority("USER", "ADMIN")
+                                   .requestMatchers(HttpMethod.PUT, "/api/events/{eventId}").hasAnyAuthority("USER", "ADMIN")
+                                   .requestMatchers(HttpMethod.DELETE, "/api/events/{eventId}").hasAnyAuthority("USER", "ADMIN")
+                                   .requestMatchers(HttpMethod.POST, "/api/events/search").hasAuthority("USER")
+
+                                   .requestMatchers(HttpMethod.POST, "/api/events/registrations/{eventId}").hasAuthority("USER")
+                                   .requestMatchers(HttpMethod.DELETE, "/api/events/registrations/cancel/{eventId}").hasAuthority("USER")
+                                   .requestMatchers(HttpMethod.GET, "/api/events/registrations/my").hasAuthority("USER")
+
+                                   .requestMatchers(HttpMethod.GET, "/api/users/{id}").hasAuthority("ADMIN")
+
+                                   .anyRequest().authenticated()
+                )
                 .addFilterBefore(jwtTokenFilter, UsernamePasswordAuthenticationFilter.class)
                 .exceptionHandling(exp -> exp.authenticationEntryPoint(customAuthEntryPoint)
                         .accessDeniedHandler(accessDeniedHandler))

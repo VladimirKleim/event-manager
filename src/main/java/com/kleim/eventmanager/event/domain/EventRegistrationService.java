@@ -1,35 +1,29 @@
 package com.kleim.eventmanager.event.domain;
 
-import com.kleim.eventmanager.auth.domain.AuthenticationService;
-import com.kleim.eventmanager.auth.pojo.User;
+import com.kleim.eventmanager.auth.pojo.AuthenticatedUser;
 import com.kleim.eventmanager.event.db.EventRegisterEntity;
 import com.kleim.eventmanager.event.db.EventRegisterRepository;
 import com.kleim.eventmanager.event.db.EventRepository;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 @Service
 public class EventRegistrationService {
 
-    private final AuthenticationService authenticationService;
     private final EventService eventService;
     private final EventRegisterRepository eventRegisterRepository;
     private final EventRepository eventRepository;
     private final EventEntityConverter eventEntityConverter;
 
-
-    public EventRegistrationService(AuthenticationService authenticationService, EventService eventService, EventRegisterRepository eventRegisterRepository, EventRepository eventRepository, EventEntityConverter eventEntityConverter) {
-        this.authenticationService = authenticationService;
+    public EventRegistrationService(EventService eventService, EventRegisterRepository eventRegisterRepository, EventRepository eventRepository, EventEntityConverter eventEntityConverter) {
         this.eventService = eventService;
         this.eventRegisterRepository = eventRegisterRepository;
         this.eventRepository = eventRepository;
         this.eventEntityConverter = eventEntityConverter;
     }
 
-
-    public void registerToEvent(Long eventId, User user) {
+    public void registerToEvent(Long eventId, AuthenticatedUser user) {
         var event = eventService.getEventById(eventId);
         var eventById = eventRepository.findById(event.id()).orElseThrow(() ->
                 new IllegalArgumentException("No such event with id=%s".formatted(event.id())));
@@ -53,8 +47,7 @@ public class EventRegistrationService {
         eventRegisterRepository.save(gotRegister);
     }
 
-
-    public void cancelRegistration(User user, Long eventId) {
+    public void cancelRegistration(AuthenticatedUser user, Long eventId) {
         var event = eventService.getEventById(eventId);
         var findRegister = eventRegisterRepository.findByEventIdAndUserId(user.id(), eventId);
         if (findRegister.isEmpty()) {
@@ -66,7 +59,6 @@ public class EventRegistrationService {
 
         eventRegisterRepository.delete(findRegister.orElseThrow());
     }
-
 
     public List<Event> findRegEvents(Long userId) {
         var findEvents = eventRegisterRepository.findEvents(userId);
