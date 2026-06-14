@@ -1,13 +1,12 @@
 package com.kleim.eventmanager.auth.api;
 
 import com.kleim.eventmanager.auth.domain.AuthenticationService;
-import com.kleim.eventmanager.auth.converter.UserDtoConverter;
-import com.kleim.eventmanager.auth.domain.UserRegisterService;
+import com.kleim.eventmanager.mapper.UserMapper;
+import com.kleim.eventmanager.auth.domain.RegistrationService;
 import com.kleim.eventmanager.auth.domain.UserService;
 import com.kleim.eventmanager.auth.pojo.SignInRequest;
 import com.kleim.eventmanager.auth.pojo.SignUpRequest;
 import com.kleim.eventmanager.auth.pojo.UserDTO;
-import com.kleim.eventmanager.security.token.JwtTokenManager;
 import com.kleim.eventmanager.security.token.JwtTokenResponse;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
@@ -17,24 +16,20 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/users")
+@RequestMapping("api/users")
 public class UserController {
 
     private final Logger log = LoggerFactory.getLogger(UserController.class);
-    private final UserRegisterService userRegisterService;
-    private final UserDtoConverter userDTOconverter;
+    private final RegistrationService registrationService;
+    private final UserMapper userDTOconverter;
     private final UserService userService;
-
     private final AuthenticationService authenticationService;
 
-    private final JwtTokenManager jwtTokenManager;
-
-    public UserController(UserRegisterService userRegisterService, UserDtoConverter userDTOconverter, UserService userService, AuthenticationService authenticationService, JwtTokenManager jwtTokenManager) {
-        this.userRegisterService = userRegisterService;
+    public UserController(RegistrationService registrationService, UserMapper userDTOconverter, UserService userService, AuthenticationService authenticationService) {
+        this.registrationService = registrationService;
         this.userDTOconverter = userDTOconverter;
         this.userService = userService;
         this.authenticationService = authenticationService;
-        this.jwtTokenManager = jwtTokenManager;
     }
 
     @PostMapping
@@ -42,20 +37,18 @@ public class UserController {
           @RequestBody @Valid SignUpRequest signUpRequest
     ) {
         log.info("User register with: login={}, age={}", signUpRequest.login(), signUpRequest.age());
-        var savedUser = userRegisterService.saveUser(signUpRequest);
+        var savedUser = registrationService.saveUser(signUpRequest);
        return ResponseEntity.status(HttpStatus.CREATED).body(userDTOconverter.toDtoUser(savedUser));
     }
 
-
     @PostMapping("/auth")
     public ResponseEntity<JwtTokenResponse> signInUser(
-          @RequestBody SignInRequest signInRequest
+          @RequestBody @Valid SignInRequest signInRequest
     ) {
         log.info("User success sing-in with login={}", signInRequest.login());
         var token = authenticationService.authUser(signInRequest);
         return ResponseEntity.ok(new JwtTokenResponse(token));
     }
-
 
     @GetMapping("/{id}")
     public ResponseEntity<UserDTO> getUserById(

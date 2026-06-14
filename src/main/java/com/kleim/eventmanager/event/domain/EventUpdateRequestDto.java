@@ -1,6 +1,5 @@
 package com.kleim.eventmanager.event.domain;
 
-import jakarta.persistence.MapsId;
 import jakarta.validation.constraints.Future;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.Positive;
@@ -26,5 +25,4 @@ public record EventUpdateRequestDto(
         Integer duration,
 
         Long locationId
-) {
-}
+) {}

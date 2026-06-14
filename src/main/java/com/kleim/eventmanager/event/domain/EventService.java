@@ -1,47 +1,42 @@
 package com.kleim.eventmanager.event.domain;
 
-import com.kleim.eventmanager.auth.domain.UserRole;
 import com.kleim.eventmanager.event.NotificationService;
 import com.kleim.eventmanager.event.db.EventRepository;
-import com.kleim.eventmanager.location.domain.LocationService;
+import com.kleim.eventmanager.location.domain.LocationServiceImpl;
 import com.kleim.eventmanager.auth.domain.AuthenticationService;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.Cacheable;
+import com.kleim.eventmanager.mapper.EventDbMapper;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
 
-
 @Service
 public class EventService {
 
     private final EventRepository eventRepository;
-    private final LocationService locationService;
+    private final LocationServiceImpl locationService;
     private final AuthenticationService authenticationService;
     private final EventEntityConverter eventEntityConverter;
     private final NotificationService notificationService;
-    private final EventCreateMapper eventCreateMapper;
+    private final EventDbMapper eventDbMapper;
     private final EventUpdateMapper eventUpdateMapper;
 
     private final EventService self;
 
-
-    public EventService(EventRepository eventRepository, LocationService locationService, AuthenticationService authenticationService, EventEntityConverter eventEntityConverter, NotificationService notificationService, EventCreateMapper eventCreateMapper, EventUpdateMapper eventUpdateMapper, @Lazy EventService self) {
+    public EventService(EventRepository eventRepository, LocationServiceImpl locationService, AuthenticationService authenticationService, EventEntityConverter eventEntityConverter, NotificationService notificationService, EventDbMapper eventDbMapper, EventUpdateMapper eventUpdateMapper, @Lazy EventService self) {
         this.eventRepository = eventRepository;
         this.locationService = locationService;
         this.authenticationService = authenticationService;
         this.eventEntityConverter = eventEntityConverter;
         this.notificationService = notificationService;
-        this.eventCreateMapper = eventCreateMapper;
+        this.eventDbMapper = eventDbMapper;
         this.eventUpdateMapper = eventUpdateMapper;
         this.self = self;
     }
 
-
-    @CacheEvict(value = "events", allEntries = true)
     public Event eventCreate(EventCreateRequest eventCreateRequest) {
 
        var user = authenticationService.getCurrentAuthUser();
@@ -52,25 +47,21 @@ public class EventService {
                    .formatted(location.capacity(), eventCreateRequest.maxPlace()));
        }
 
-       var eventEntity = eventCreateMapper.toEntity(user.id(), eventCreateRequest);
+       var eventEntity = eventDbMapper.toEntity(user.id(), eventCreateRequest);
        var savedEntity = eventRepository.save(eventEntity);
 
        return eventEntityConverter.toDomain(savedEntity);
     }
 
-
-    @Cacheable(value = "events", key = "#eventId")
     public Event getEventById(Long eventId) {
         var gotEvent = eventRepository.findById(eventId).orElseThrow(() ->
                 new IllegalArgumentException("Event does not exist"));
         return eventEntityConverter.toDomain(gotEvent);
     }
 
-
     @Transactional
-    @CacheEvict(value = "events", key = "#eventId")
+    @PreAuthorize("@eventSecurity.canModified(#eventId)")
     public void cancelEventById(Long eventId) {
-     checkAccessToModifyEvent(eventId);
      var event = self.getEventById(eventId);
      if (event.id() != null) {
          if (event.status().equals(EventStatus.CANCELLED)) {
@@ -79,24 +70,11 @@ public class EventService {
          if (event.status().equals(EventStatus.FINISHED) || event.status().equals(EventStatus.STARTED)) {
              throw new IllegalArgumentException("Event has been started or finished");
          }
-         //soft delete
          eventRepository.changeEventStatus(eventId, EventStatus.CANCELLED);
 
          notificationService.changeEventStatus(event.id(), EventStatus.CANCELLED);
      }
     }
-
-
-    public void checkAccessToModifyEvent(Long eventId) {
-        var user = authenticationService.getCurrentAuthUser();
-        var event = getEventById(eventId);
-        if (event.ownerId().equals(user.id()) || user.role().equals(UserRole.ADMIN)) {
-            return;
-        } else {
-            throw new IllegalArgumentException("Forbidden, access denied");
-        }
-    }
-
 
     public List<Event> getAllEvents() {
         var gotAllEvents = eventRepository.findAll();
@@ -105,18 +83,16 @@ public class EventService {
                 .toList();
     }
 
-
     @Transactional
-    @CacheEvict(value = "events", allEntries = true)
+    @PreAuthorize("@eventSecurity.canModified(#eventId)")
     public Event updateEvent(Long eventId, EventUpdateRequest updateRequest) {
-        checkAccessToModifyEvent(eventId);
         var event = getEventById(eventId);
         var location = locationService.getLocationById(
                 Optional.ofNullable(updateRequest.locationId()).orElse(event.locationId())
         );
 
         if (event.status().equals(EventStatus.CANCELLED)) {
-            throw new IllegalArgumentException("Event is already over.");
+            throw new IllegalArgumentException("Event is already over");
         }
         if (event.status().equals(EventStatus.FINISHED) || event.status().equals(EventStatus.STARTED)) {
             throw new IllegalArgumentException("Event has been started or finished");
@@ -147,9 +123,7 @@ public class EventService {
         return updatedEvent;
     }
 
-
-
-    @Transactional(readOnly = true) //DML
+    @Transactional(readOnly = true)
     public List<Event> searchFilter(EventSearchRequest searchRequest) {
 
         var foundedEvents = eventRepository.searchAllEventsByFilter(
@@ -170,7 +144,6 @@ public class EventService {
                 .map(eventEntityConverter::toDomain)
                 .toList();
     }
-
 
     @Transactional(readOnly = true)
     public List<Event> getOwner() {

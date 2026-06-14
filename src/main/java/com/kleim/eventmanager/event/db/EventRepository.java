@@ -13,7 +13,6 @@ import java.time.LocalDateTime;
 
 public interface EventRepository extends JpaRepository<EventEntity, Long> {
 
-
     @Modifying
     @Query("""
           UPDATE EventEntity e
@@ -24,7 +23,6 @@ public interface EventRepository extends JpaRepository<EventEntity, Long> {
           @Param("id")  Long eventId,
           @Param("status")  EventStatus status
     );
-
 
     @Query("""
           SELECT e FROM EventEntity e WHERE
@@ -54,11 +52,9 @@ public interface EventRepository extends JpaRepository<EventEntity, Long> {
             @Param("status")   EventStatus status
     );
 
-
     List<EventEntity> findAllByOwnerId(
            Long ownerId
     );
-
 
     @Modifying
     @Query("""
@@ -70,7 +66,6 @@ public interface EventRepository extends JpaRepository<EventEntity, Long> {
             @Param("oldStatus") EventStatus oldStatus,
             @Param("newStatus") EventStatus newStatus
     );
-
 
     @Modifying
     @Query(value = """

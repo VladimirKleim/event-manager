@@ -1,7 +1,7 @@
 package com.kleim.eventmanager.security;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.kleim.eventmanager.middleware.ServerErrorDTO;
+import com.kleim.eventmanager.middleware.ServerErrorMessage;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -31,7 +31,7 @@ public class CustomAuthEntryPoint implements AuthenticationEntryPoint {
             AuthenticationException authException
     ) throws IOException, ServletException {
         logger.info("Handle auth exception ");
-        var messageResponse = new ServerErrorDTO(
+        var messageResponse = new ServerErrorMessage(
                 "Got error to auth",
                 authException.getMessage(),
                 LocalDateTime.now()
@@ -41,6 +41,5 @@ public class CustomAuthEntryPoint implements AuthenticationEntryPoint {
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         response.setStatus(HttpStatus.UNAUTHORIZED.value());
         response.getWriter().write(stringResponse);
-
     }
 }

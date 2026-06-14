@@ -24,6 +24,4 @@ public record EventDto(
         @NotNull
         Long locationId,
         EventStatus status
-)
-{
-}
+) {}

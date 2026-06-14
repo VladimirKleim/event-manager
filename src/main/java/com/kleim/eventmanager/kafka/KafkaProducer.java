@@ -3,8 +3,6 @@ package com.kleim.eventmanager.kafka;
 import com.kleim.eventmanager.event.EventChangeKafkaMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Bean;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Component;
 
@@ -19,7 +17,6 @@ public class KafkaProducer {
         this.kafkaTemplate = kafkaTemplate;
     }
 
-
     public void sendMessage(EventChangeKafkaMessage kafkaMessage) {
         log.info("Kafka has start send message: {}", kafkaMessage);
       var result = kafkaTemplate.send(
@@ -30,5 +27,4 @@ public class KafkaProducer {
 
       result.thenAccept(res -> log.info("Сообщение успешно проброшено в кафку. Сообщение: {}, id: {}", kafkaMessage, kafkaMessage.getEventId()));
     }
-
 }

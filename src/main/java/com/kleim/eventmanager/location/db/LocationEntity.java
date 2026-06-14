@@ -1,8 +1,6 @@
 package com.kleim.eventmanager.location.db;
 
-
 import jakarta.persistence.*;
-
 
 @Entity
 @Table(name = "locations")
@@ -21,7 +19,7 @@ public class LocationEntity {
     @Column(name = "capacity", nullable = false)
     private Integer capacity;
 
-    @Column(name = "description", nullable = true)
+    @Column(name = "description")
     private String description;
 
     public LocationEntity(){}

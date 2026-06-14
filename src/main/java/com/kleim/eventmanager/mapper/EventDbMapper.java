@@ -1,19 +1,21 @@
-package com.kleim.eventmanager.event.domain;
+package com.kleim.eventmanager.mapper;
 
 import com.kleim.eventmanager.event.db.EventEntity;
+import com.kleim.eventmanager.event.domain.EventCreateRequest;
+import com.kleim.eventmanager.event.domain.EventCreateRequestDto;
+import com.kleim.eventmanager.event.domain.EventStatus;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.ReportingPolicy;
 
 import java.util.ArrayList;
 
-
 @Mapper(
         componentModel = "spring",
         unmappedTargetPolicy = ReportingPolicy.WARN,
         imports = {ArrayList.class, EventStatus.class}
 )
-public interface EventCreateMapper {
+public interface EventDbMapper {
 
     EventCreateRequest toDomain(EventCreateRequestDto eventCreateRequest);
 
